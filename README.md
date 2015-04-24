@@ -17,20 +17,20 @@ add_arg name        --help "Your name."
 # A flag (-v or --verbose)
 add_opt verbose v   --help "Enable verbose mode."
 
-getoptz_configure   --help "Help message for your script."
+getoptz_configure   --help "Print a hello world message."
 getoptz_parse "$@"
 
 # Your script begins here
-[[ ! $verbose ]] || echo "name=$name"
+[[ ! $verbose ]] || echo "[INFO] name=$name"
 echo "Hello, $name!"
 ```
 
-You get the following help message:
+Execution:
 <pre>
 $ ./hello.sh --help
 Usage: hello.sh [<i>options</i>] [--] <i>name</i>
 Description:
-    Help message for your script.
+    Print a hello world message.
 
 Arguments:
      <i>name</i>
@@ -42,6 +42,13 @@ Options:
 
      -v, --verbose
             Enable verbose mode.
+
+$ ./hello.sh World
+Hello, World!
+
+$ ./hello.sh -v world
+[INFO] name=world
+Hello, world!
 </pre>
 
 ## Advanced usage
