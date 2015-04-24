@@ -27,7 +27,7 @@ echo "Hello, $name!"
 
 Execution:
 <pre>
-$ ./hello.sh --help
+$ ./example_hello.sh --help
 Usage: hello.sh [<i>options</i>] [--] <i>name</i>
 Description:
     Print a hello world message.
@@ -43,10 +43,10 @@ Options:
      -v, --verbose
             Enable verbose mode.
 
-$ ./hello.sh World
+$ ./example_hello.sh World
 Hello, World!
 
-$ ./hello.sh -v world
+$ ./example_hello.sh -v world
 [INFO] name=world
 Hello, world!
 </pre>
