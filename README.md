@@ -11,7 +11,7 @@ Works for GNU Bash version >= 4.
 ```bash
 . getoptz.sh
 
-# Variable 'file' will be set to the value of the first argument
+# Variable 'name' will be set to the value of the first argument
 add_arg name        --help "Your name."
 
 # A flag (-v or --verbose)
