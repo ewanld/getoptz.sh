@@ -2,26 +2,7 @@
 # ------------------------------------------------------------------------------
 # Library to parse command line arguments.
 # Works with Bash version >= 4.
-# 
-# functions/variables starting with __ are internal functions.
-# Other functions/variables are part of the public API.
-# 
-# Sample usage:
-#   add_opt output_dir: d                  --help "Output directory. The colon means a value is mandatory"
-#   add_arg file                           --help "Input file"
-#   getoptz_configure                      --help "Description of my script."
-#   getoptz_parse "$@"
-#  
-# Examples of valid arguments:
-#   ./my_script --dir /tmp /tmp/myfile.txt
-#   ./my_script -d/tmp /tmp/myfile.txt
-#   ./my_script /tmp/myfile.txt
-
-# Examples of invalid arguments:
-#   ./my_script --dir /tmp              # argument 'file' is missing!
-#   ./my_script /tmp/myfile.txt 2       # only 1 argument expected, got 2!
 # ------------------------------------------------------------------------------
-
 function getoptz_parse {
 	while [[ $# -gt 0 ]]; do
 		if [[ $1 == '--' ]]; then
@@ -33,15 +14,6 @@ function getoptz_parse {
 			getoptz_usage
 			exit 0
 
-		# FIXME handle case where the first option (e.g 'x' in -xvf) is not a flag -> flags should not be expanded
-		#elif [[ $1 =~ ^-([[:alnum:]]{2,}) ]]; then
-		#	# case -xvf
-		#	local opts=${BASH_REMATCH[1]}
-		#	echo "-xvf"
-		#	opts_expanded=$(echo $opts | sed 's/./-& /g')
-		#	shift
-		#	set -- $opts_expanded "$@"
-	
 		elif [[ $1 =~ ^(-[[:alnum:]])[=:]?(.+) || \
 			    $1 =~ ^(--[[:alnum:]_-]{2,})[=:](.+) ]]; then
 			# case -v=1 or -v1 or -v:1 or --verbose=1 or --verbose:1
