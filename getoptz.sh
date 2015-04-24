@@ -43,7 +43,7 @@ function getoptz_parse {
 		#	set -- $opts_expanded "$@"
 	
 		elif [[ $1 =~ ^(-[[:alnum:]])[=:]?(.+) || \
-			    $1 =~ ^(--[[:alnum:]_]{2,})[=:](.+) ]]; then
+			    $1 =~ ^(--[[:alnum:]_-]{2,})[=:](.+) ]]; then
 			# case -v=1 or -v1 or -v:1 or --verbose=1 or --verbose:1
 			local option="${BASH_REMATCH[1]}"
 			local value="${BASH_REMATCH[2]}"
@@ -51,7 +51,7 @@ function getoptz_parse {
 			shift
 
 		elif [[ $1 =~ ^-([[:alnum:]]) || \
-			    $1 =~ ^--([[:alnum:]_]{2,}) ]]; then
+			    $1 =~ ^--([[:alnum:]_-]{2,}) ]]; then
 			# case -v 1 or -v or --verbose or --verbose 1
 			local option="${BASH_REMATCH[1]}"
 			local long_name=${__opt_long_name[$option]:-}
