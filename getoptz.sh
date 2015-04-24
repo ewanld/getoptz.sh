@@ -324,7 +324,7 @@ function add_arg {
 	__arg_default_val+=("$default_value")
 	__arg_help+=("$help_string")
 	__arg_multiplicity+=("$multiplicity")
-	__getoptz_assign_variable "$arg_name" "$default_value"
+	[[ $multiplicity == @('+'|'*') ]] || __getoptz_assign_variable "$arg_name" "$default_value"
 }
 
 function getoptz_print_report {
