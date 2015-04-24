@@ -163,10 +163,10 @@ Notes:
 Syntax: ```add_arg ARG_NAME [1 | '?' | '+' | '*' ] [--help HELP_STRING] [--default DEFAULT_VALUE]```
 
 Accept an argument with the following multiplicity:
-* ```add_arg myarg   1```: exactly 1 argument
-* ```add_arg myarg '?'```: 0 or 1 argument
-* ```add_arg myarg   +```: 1 or more arguments
-* ```add_arg myarg '*'```: 0 or more arguments
+* ```1```: exactly 1 argument
+* ```?```: 0 or 1 argument
+* ```+```: 1 or more arguments
+* ```*```: 0 or more arguments
    
 Note: '?' and '*' are special caracters of the shell so they need to be quoted.
 
