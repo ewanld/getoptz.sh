@@ -109,6 +109,26 @@ Hello, John!
 Hello, Peter!
 ```
 
+### Default values
+```bash
+. getoptz.sh
+add_opt type: t --default f --help 'f for files, d for directories'
+getoptz_parse "$@"
+
+[[ $type == @(f|d) ]] || getoptz_usage
+find . -type $type
+```
+
+Execution
+```
+$ ./example_default_values.sh -tf
+--> lists all regular files
+$ ./example_default_values.sh -td
+--> lists all directories
+$ ./example_default_values.sh
+--> lists all regular files
+```
+
 ## API documentation
 
 ### getopz_parse
