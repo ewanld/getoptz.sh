@@ -9,7 +9,6 @@ Works for GNU Bash version >= 4.
 ## Quickstart
 ```bash
 . getoptz.sh
-
 add_arg name        --help "Your name."
 add_opt verbose v   --help "Enable verbose mode."
 getoptz_configure   --help "Print a hello world message."
