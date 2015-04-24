@@ -57,5 +57,5 @@ Hello, world!
 ## Advanced usage
 TODO
 
-# Restrictions, bugs
+## Restrictions, bugs
 * Options require a long name. Having only a short name is forbidden, since the long name defines the name of the variable to be written.
