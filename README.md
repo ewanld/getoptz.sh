@@ -6,17 +6,11 @@ v0.1 alpha.
 
 Works for GNU Bash version >= 4.
 
-## Features
-* Automatic generation of a help message (-h or --help option).
-* Supports short options (-o1) and long options (--option=1)
-
-## Usage
-### Basic usage: positional arguments and flags
+## Quickstart
 ```bash
 . getoptz.sh
-# Variable 'name' will be set to the value of the first argument
+
 add_arg name        --help "Your name."
-# A flag (-v or --verbose)
 add_opt verbose v   --help "Enable verbose mode."
 getoptz_configure   --help "Print a hello world message."
 getoptz_parse "$@"
@@ -52,6 +46,11 @@ $ ./example_hello.sh -v world
 Hello, world!
 </pre>
 
+## Features
+* Automatic generation of a help message (-h or --help option).
+* Supports short options (-o1) and long options (--option=1)
+
+## Examples
 ### Multiple arguments
 Simply declare the arguments in the order they are expected:
 ```
@@ -74,19 +73,19 @@ TODO
 ### Array arguments
 TODO
 
-### API documentation
+## API documentation
 
-#### getopz_parse
+### getopz_parse
 Syntax: ```getoptz_parse [args]...```
 
 Parse the specified arguments.
 
-#### getopz_usage
+### getopz_usage
 Syntax: ``` getoptz_usage ```
 
 Print a help message detailing the allowed options and arguments.
 
-#### add_opt
+### add_opt
 Syntax: ```add_opt LONG_NAME[:] [SHORT_NAME] [--help HELP_STRING] [--dest DEST_VAR] [--default DEFAULT_VALUE]```
 
 Add an option to the command line specification: valued option, or non-valued (*i.e.* flag).
@@ -102,7 +101,7 @@ Notes:
 * DEST_VAR allows to override the default mapping (LONG_NAME => variable name) for the variable name.
 * DEFAULT_VALUE allows to override the default value ('') for missing options.
 
-#### add_arg
+### add_arg
 Syntax: ```add_arg ARG_NAME [1 | '?' | '+' | '*' ] [--help HELP_STRING] [--default DEFAULT_VALUE]```
 
 Accept an argument with the following multiplicity:
@@ -115,7 +114,7 @@ Note: '?' and '*' are special caracters of the shell so they need to be quoted.
 
 For multiplicities '+' and '*', the corresponding variable is a Bash array. Otherwise, the variable is a regular string.
 
-#### getoptz_print_report
+### getoptz_print_report
 Syntax: ``` getoptz_print_report ```
 
 Reports all parsed arguments and options (for debugging).
