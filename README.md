@@ -47,12 +47,12 @@ Hello, world!
 
 ## Features
 * Automatic generation of a help message (-h or --help option).
-* Supports short options (-o1) and long options (--option=1)
+* Supports short options (-o1) and long options (--option=1).
 
 ## Examples
 ### Multiple arguments
 Simply declare the arguments in the order they are expected:
-```
+```bash
 . getoptz.sh
 add_arg name
 add_arg city
@@ -67,10 +67,46 @@ Greetings from Paris, John!
 ```
 
 ### Optional arguments
-TODO
+'?' will mark an argument as optional:
+```bash
+. getoptz.sh
+add_arg name
+add_arg city '?'
+getoptz_parse "$@"
+
+echo -n "Greetings"
+[[ ! $city ]] || echo -n " from $city"
+echo ", $name!"
+```
+
+Execution:
+```
+$ ./example_optional_args.sh John
+Greetings, John!
+
+$ ./example_optional_args.sh John Paris
+Greetings from Paris, John!
+```
 
 ### Array arguments
-TODO
+'+' allows an argument to be repeated 1 or more times.
+'*' allows an argument to be repeated 0 or more times.
+```bash
+. getoptz.sh
+add_arg names +
+getoptz_parse "$@"
+
+for n in "${names[@]}"; do
+    echo "Hello, $n!"
+done
+```
+
+Execution:
+```
+$ ./example_array_args.sh John Peter
+Hello, John!
+Hello, Peter!
+```
 
 ## API documentation
 
