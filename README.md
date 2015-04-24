@@ -1,5 +1,8 @@
 # getoptz.sh
+
 Command-line argument parser for Bash
+
+v0.1 alpha.
 
 Works for GNU Bash version >= 4.
 
