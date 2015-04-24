@@ -123,8 +123,10 @@ Execution
 ```
 $ ./example_default_values.sh -tf
 --> lists all regular files
+
 $ ./example_default_values.sh -td
 --> lists all directories
+
 $ ./example_default_values.sh
 --> lists all regular files
 ```
