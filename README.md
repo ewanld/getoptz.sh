@@ -48,6 +48,7 @@ Hello, world!
 ## Features
 * Automatic generation of a help message (-h or --help option).
 * Supports short options (-o1) and long options (--option=1).
+* According to tradition, '--' signals the end of options.
 
 ## Examples
 ### Multiple arguments
