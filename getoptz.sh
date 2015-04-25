@@ -2,6 +2,9 @@
 # ------------------------------------------------------------------------------
 # Library to parse command line arguments.
 # Works with Bash version >= 4.
+#
+# functions/variables starting with __ are internal functions.
+# Other functions/variables are part of the public API.
 # ------------------------------------------------------------------------------
 function getoptz_parse {
 	while [[ $# -gt 0 ]]; do
