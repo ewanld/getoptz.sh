@@ -21,6 +21,13 @@ echo "Hello, $name!"
 
 Execution:
 <pre>
+$ ./example_hello.sh world
+Hello, world!
+
+$ ./example_hello.sh -v world
+[INFO] name=world
+Hello, world!
+
 $ ./example_hello.sh --help
 Usage: hello.sh [<i>options</i>] [--] <i>name</i>
 Description:
@@ -36,13 +43,6 @@ Options:
 
      -v, --verbose
             Enable verbose mode.
-
-$ ./example_hello.sh World
-Hello, World!
-
-$ ./example_hello.sh -v world
-[INFO] name=world
-Hello, world!
 </pre>
 
 ## Features
