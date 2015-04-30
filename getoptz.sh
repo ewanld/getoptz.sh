@@ -318,7 +318,7 @@ function getoptz_print_report {
 
 declare -A OPT
 declare -a ARG=()
-declare -a __arg_name __arg_multiplicity __arg_default_val __arg_help
+declare -a __arg_name=() __arg_multiplicity __arg_default_val __arg_help
 declare -A __opt_long_name __opt_is_flag __opt_default_val __opt_help __opt_dest
 declare -A __getoptz_conf
 
