@@ -235,7 +235,7 @@ function add_opt {
 	if [[ ${1: -1} == ':' ]]; then is_flag=''; fi
 	shift
 
-	if [[ ${1:-} != --* ]]; then
+	if [[ $# -gt 0 && ${1:-} != --* ]]; then
 		# short name is provided
 		local short_name=$1
 		[[ ${#short_name} -eq 1 ]] || __getoptz_die "add_opt: SHORT_OPTION must be 1 character long!"
