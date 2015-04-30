@@ -53,11 +53,20 @@ function run_all_tests {
 	expect_exit 0 "$script_path" 'a_with_special_chars'
 	expect_exit 0 "$script_path" 'a_with_newline'
 
-	# test options
-	expect_exit 0 "$script_path" '--opt:_with_--opt:'
+	# test options (option name and value separated with a space)
+	expect_exit 0 "$script_path" '--opt:_with_--opt_2'
 	expect_exit 0 "$script_path" '--opt_with_--opt'
 	expect_exit 1 "$script_path" '--opt:_with_--opt_fail'
-	expect_exit 1 "$script_path" '--opt_with_--opt:_fail'
+	expect_exit 1 "$script_path" '--opt_with_--opt_1_fail'
+	expect_exit 0 "$script_path" '-o:_with_-o_2'
+	expect_exit 0 "$script_path" '-o_with_-o'
+	expect_exit 1 "$script_path" '-o:_with_-o_fail'
+	expect_exit 1 "$script_path" '-o_with_-o_2_fail'
+
+	# test alternative ways of setting options (--opt=2 or --opt:2 or -o2)
+	expect_exit 0 "$script_path" '--opt:_with_--opt=2'
+	expect_exit 0 "$script_path" '--opt:_with_--opt:2'
+	expect_exit 0 "$script_path" '-o:_with_-o2'
 }
 
 function run_test {
@@ -255,7 +264,7 @@ function run_test {
 		getoptz_parse 1$'\n'2
 		expect_equals "$a" 1$'\n'2
 		;;
-	'--opt:_with_--opt:')
+	'--opt:_with_--opt_2')
 		add_opt opt:
 		getoptz_parse --opt 1
 		expect_equals "$opt" 1
@@ -269,9 +278,39 @@ function run_test {
 		add_opt opt:
 		getoptz_parse --opt
 		;;
-	'--opt_with_--opt:_fail')
+	'--opt_with_--opt_2_fail')
 		add_opt opt
 		getoptz_parse --opt 1
+		;;
+	'-o_with_-o')
+		add_opt opt o
+		getoptz_parse -o
+		expect_equals "$opt" 1
+		;;
+	'-o:_with_-o_2')
+		add_opt opt: o
+		getoptz_parse -o 2
+		expect_equals "$opt" 2
+		;;
+	'-o:_with_-o_fail')
+		add_opt opt: o
+		getoptz_parse -o
+		;;
+	'-o_with_-o_2_fail')
+		add_opt opt o
+		getoptz_parse -o 2
+		;;
+	'--opt:_with_--opt=2')
+		add_opt opt: o
+		getoptz_parse --opt=2
+		;;
+	'--opt:_with_--opt:2')
+		add_opt opt: o
+		getoptz_parse --opt:2
+		;;
+	'-o:_with_-o2')
+		add_opt opt: o
+		getoptz_parse -o2
 		;;
 	*)
 		_die "unknown test: $test_name!"
