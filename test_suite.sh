@@ -11,136 +11,135 @@ function main {
 }
 
 function run_all_tests {
-	expect_exit 0 "$script_path" '0_arg_0_arg'
-	expect_exit 1 "$script_path" '0_arg_1_arg_fail'
-	expect_exit 1 "$script_path" '1_arg_0_arg_fail'
-	expect_exit 0 "$script_path" '1_arg_1_arg'
-	expect_exit 1 "$script_path" '1_arg_2_arg_fail'
-	expect_exit 0 "$script_path" '1_arg_optional_0_arg'
-	expect_exit 0 "$script_path" '1_arg_optional_1_arg'
-	expect_exit 1 "$script_path" '1_arg_optional_2_arg_fail'
-	expect_exit 1 "$script_path" '2_arg_1_arg_fail'
-	expect_exit 0 "$script_path" '2_arg_2_arg'
-	expect_exit 1 "$script_path" '2_arg_3_arg_fail'
-	expect_exit 0 "$script_path" '2_arg_optional_0_arg'
-	expect_exit 0 "$script_path" '2_arg_optional_1_arg'
-	expect_exit 0 "$script_path" '2_arg_optional_2_arg'
-	expect_exit 1 "$script_path" '2_arg_optional_3_arg_fail'
-	expect_exit 1 "$script_path" '2_arg_optional_3_arg_fail'
-	expect_exit 1 "$script_path" '1_arg_1_arg_optional_0_arg_fail'
-	expect_exit 0 "$script_path" '1_arg_1_arg_optional_1_arg'
-	expect_exit 0 "$script_path" '1_arg_1_arg_optional_2_arg'
-	expect_exit 1 "$script_path" '1_arg_1_arg_optional_3_arg_fail'
-	expect_exit 1 "$script_path" '1_arg_optional_1_arg_fail'
-	expect_exit 0 "$script_path" '1_arg*_0_arg'
+	expect_exit 0 "$script_path" 'nil_with_nil'
+	expect_exit 1 "$script_path" 'nil_with_1_fail'
+	expect_exit 1 "$script_path" 'a_with_nil_fail'
+	expect_exit 0 "$script_path" 'a_with_1'
+	expect_exit 1 "$script_path" 'a_with_12_fail'
+	expect_exit 0 "$script_path" 'a?_with_nil'
+	expect_exit 0 "$script_path" 'a?_with_1'
+	expect_exit 1 "$script_path" 'a?_with_12_fail'
+	expect_exit 1 "$script_path" 'ab_with_1_fail'
+	expect_exit 0 "$script_path" 'ab_with_12'
+	expect_exit 1 "$script_path" 'ab_with_123_fail'
+	expect_exit 0 "$script_path" 'a?b?_with_nil'
+	expect_exit 0 "$script_path" 'a?b?_with_1'
+	expect_exit 0 "$script_path" 'a?b?_with_12'
+	expect_exit 1 "$script_path" 'a?b?_with_123_fail'
+	expect_exit 1 "$script_path" 'ab?_with_nil_fail'
+	expect_exit 0 "$script_path" 'ab?_with_1'
+	expect_exit 0 "$script_path" 'ab?_with_12'
+	expect_exit 1 "$script_path" 'ab?_123_fail'
+	expect_exit 1 "$script_path" 'a?b_fail'
+	expect_exit 0 "$script_path" 'a*_with_nil'
 }
 
 function run_test {
 	local -l test_name=$1; shift
 	
 	case "$test_name" in
-	'0_arg_0_arg') getoptz_parse;;
-	'0_arg_1_arg_fail') getoptz_parse 1;;
+	'nil_with_nil') getoptz_parse;;
+	'nil_with_1_fail') getoptz_parse 1;;
 	'0_arg_2_arg_fail') getoptz_parse 1 2;;
-	'1_arg_0_arg_fail')
+	'a_with_nil_fail')
 		add_arg a
 		getoptz_parse
 		;;
-	'1_arg_1_arg')
+	'a_with_1')
 		add_arg a
 		getoptz_parse 1
 		expect_equals "$a" 1
 		;;
-	'1_arg_2_arg_fail')
+	'a_with_12_fail')
 		add_arg a
 		getoptz_parse 1 2
 		;;
-	'1_arg_optional_0_arg')
+	'a?_with_nil')
 		add_arg a '?'
 		getoptz_parse
 		expect_equals "$a" ''
 		;;
-	'1_arg_optional_1_arg')
+	'a?_with_1')
 		add_arg a '?'
 		getoptz_parse 1
 		expect_equals "$a" 1
 		;;
-	'1_arg_optional_2_arg_fail')
+	'a?_with_12_fail')
 		add_arg a '?'
 		getoptz_parse 1 2
 		;;
-	'2_arg_1_arg_fail')
+	'ab_with_1_fail')
 		add_arg a
 		add_arg b
 		getoptz_parse 1
 		;;
-	'2_arg_2_arg')
+	'ab_with_12')
 		add_arg a
 		add_arg b
 		getoptz_parse 1 2
 		expect_equals "$a" 1
 		expect_equals "$b" 2
 		;;
-	'2_arg_3_arg_fail')
+	'ab_with_123_fail')
 		add_arg a
 		add_arg b
 		getoptz_parse 1 2 3
 		;;
-	'2_arg_optional_0_arg')
+	'a?b?_with_nil')
 		add_arg a '?'
 		add_arg b '?'
 		getoptz_parse
 		expect_equals "$a" ""
 		expect_equals "$b" ""
 		;;
-	'2_arg_optional_1_arg')
+	'a?b?_with_1')
 		add_arg a '?'
 		add_arg b '?'
 		getoptz_parse 1
 		expect_equals "$a" 1
 		expect_equals "$b" ""
 		;;
-	'2_arg_optional_2_arg')
+	'a?b?_with_12')
 		add_arg a '?'
 		add_arg b '?'
 		getoptz_parse 1 2
 		expect_equals "$a" 1
 		expect_equals "$b" 2
 		;;
-	'2_arg_optional_3_arg_fail')
+	'a?b?_with_123_fail')
 		add_arg a '?'
 		add_arg b '?'
 		getoptz_parse 1 2 3
 		;;
-	'1_arg_1_arg_optional_0_arg_fail')
+	'ab?_with_nil_fail')
 		add_arg a
 		add_arg b '?'
 		getoptz_parse
 		;;
-	'1_arg_1_arg_optional_1_arg')
+	'ab?_with_1')
 		add_arg a
 		add_arg b '?'
 		getoptz_parse 1
 		expect_equals "$a" 1
 		expect_equals "$b" ""
 		;;
-	'1_arg_1_arg_optional_2_arg')
+	'ab?_with_12')
 		add_arg a
 		add_arg b '?'
 		getoptz_parse 1 2
 		expect_equals "$a" 1
 		expect_equals "$b" 2
 		;;
-	'1_arg_1_arg_optional_3_arg_fail')
+	'ab?_with_123_fail')
 		add_arg a
 		add_arg b '?'
 		getoptz_parse 1 2 3
 		;;
-	'1_arg_optional_1_arg_fail')
+	'a?b_fail')
 		add_arg a '?'
 		add_arg b
 		;;
-	'1_arg*_0_arg')
+	'a*_with_nil')
 		add_arg a '*'
 		getoptz_parse
 		;;
