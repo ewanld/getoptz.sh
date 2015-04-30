@@ -2,7 +2,7 @@
 
 Command-line argument parser for Bash
 
-v0.1 alpha.
+v0.2 beta.
 
 Works for GNU Bash version >= 4.
 
