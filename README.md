@@ -184,7 +184,7 @@ getoptz.sh has been tested in the following environments:
 
 Run ```./test_suite.sh``` with no arguments to test getoptz.sh in your environment.
 
-## Restrictions, bugs
+## Restrictions
 * Options require a long name. Having only a short name is forbidden, since the long name defines the name of the variable to be written.
 * Setting multiple flags at once (e.g ```tar -xvf```) is not yet supported.
 * Not production-ready yet!
