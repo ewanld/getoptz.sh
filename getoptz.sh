@@ -122,12 +122,12 @@ function __getoptz_array_add {
 }
 
 function __getoptz_eval_opt {
-	local __opt_long_name=$1
-	local __value=$2
-	OPT[$__opt_long_name]=$__value
-	local __opt_dest_var=${__opt_dest[$__opt_long_name]}
-	if [[ $__opt_dest_var ]]; then
-		__getoptz_assign_variable "$__opt_dest_var" "$__value"
+	local opt_long_name=$1
+	local value=$2
+	OPT[$opt_long_name]=$value
+	local opt_dest_var=${__opt_dest[$opt_long_name]}
+	if [[ $opt_dest_var ]]; then
+		__getoptz_assign_variable "$opt_dest_var" "$value"
 	fi
 }
 
@@ -203,7 +203,7 @@ function getoptz_usage {
 # Display message in case of programmer error
 function __getoptz_die {
 	local msg=$1
-	echo "$msg"
+	echo -e "$msg"
 	exit 1
 }
 
@@ -224,10 +224,9 @@ function getoptz_configure {
 	done
 }
 
-# Syntax:
-#   add_opt LONG_NAME[:] [SHORT_NAME] [--help HELP_STRING] [--dest DEST_VAR] [--default DEFAULT_VALUE]
 function add_opt {
-	[[ $# -ge 1 ]] || echo "error in add_opt!"
+  local syntax_msg="Syntax: add_opt LONG_NAME[:] [SHORT_NAME] [--help HELP_STRING] [--dest DEST_VAR] [--default DEFAULT_VALUE]"
+	[[ $# -ge 1 ]] || echo -e "error in add_opt!\n$syntax_msg"
 	
 	# parse positional args
 	local long_name=${1%:}
@@ -238,7 +237,7 @@ function add_opt {
 	if [[ $# -gt 0 && ${1:-} != --* ]]; then
 		# short name is provided
 		local short_name=$1
-		[[ ${#short_name} -eq 1 ]] || __getoptz_die "add_opt: SHORT_OPTION must be 1 character long!"
+		[[ ${#short_name} -eq 1 ]] || __getoptz_die "add_opt: SHORT_OPTION must be 1 character long!\n$syntax_msg"
 		shift
 	fi
 
@@ -249,12 +248,12 @@ function add_opt {
 			--dest) dest=$2; shift 2;;
 			--help) help_string=$2; shift 2;;
 			--default) default_value=$2; shift 2;;
-			*) __getoptz_die "add_opt: unknown argument: $1!";;
+			*) __getoptz_die "add_opt: unknown argument: $1!\n$syntax_msg";;
 		esac
 	done
 	
 	# check dest for special characters
-	[[ $dest =~ ^[[:alnum:]_]+$ ]] || __getoptz_die "add_opt: Invalid identifier: $dest!"
+	[[ $dest =~ ^[[:alnum:]_]+$ ]] || __getoptz_die "add_opt: Invalid identifier: $dest!\n$syntax_msg"
 
 	if [[ ${short_name:-} ]]; then __opt_long_name[$short_name]=$long_name; fi
 	__opt_long_name[$long_name]=$long_name
@@ -269,20 +268,21 @@ function add_opt {
 # Syntax:
 #   add_arg ARG_NAME [1 | '?' | '+' | '*' ] [--help HELP_STRING] [--default DEFAULT_VALUE]
 function add_arg {
-	[[ $# -ge 1 ]] || __getoptz_die "add_arg: at least 1 argument expected!"
+  local syntax_msg="Syntax: add_arg ARG_NAME [1 | '?' | '+' | '*' ] [--help HELP_STRING] [--default DEFAULT_VALUE]"
+	[[ $# -ge 1 ]] || __getoptz_die "add_arg: at least 1 argument expected!\n$syntax_msg"
 	# parse positional args
 	local arg_name=$1; shift
 
 	local multiplicity=1
 	if [[ $# -gt 0 && ${1:-} != --* ]]; then
 		multiplicity=$1; shift
-		[[ $multiplicity == @(1|'?'|'+'|'*') ]] || __getoptz_die "add_arg: Invalid multiplicity: $multiplicity!"
+		[[ $multiplicity == @(1|'?'|'+'|'*') ]] || __getoptz_die "add_arg: Invalid multiplicity: $multiplicity!\n$syntax_msg"
 	fi
 
 	# validate multiplicity
 	if [[ ${#__arg_name[@]} -gt 0 ]]; then
 		local multiplicity_of_last=${__arg_multiplicity[@]: -1}
-		[[ $multiplicity_of_last == 1 || ( $multiplicity_of_last == '?' && $multiplicity == '?' ) ]] || __getoptz_die "add_arg: cannot have arg n-1 with multiplicity '$multiplicity_of_last' and arg n with multiplicity '$multiplicity' !"
+		[[ $multiplicity_of_last == 1 || ( $multiplicity_of_last == '?' && $multiplicity == '?' ) ]] || __getoptz_die "add_arg: cannot have arg n-1 with multiplicity '$multiplicity_of_last' and arg n with multiplicity '$multiplicity' !\n$syntax_msg"
 	fi
 
 	# parse options	
@@ -291,7 +291,7 @@ function add_arg {
 		case "$1" in
 			--help) help_string=$2; shift 2;;
 			--default) default_value=$2; shift 2;;
-			*) __getoptz_die "add_arg: unknown argument: $1!";;
+			*) __getoptz_die "add_arg: unknown argument: $1!\n$syntax_msg";;
 		esac
 	done
 
@@ -316,9 +316,20 @@ function getoptz_print_report {
 	done
 }
 
+# map of "option long name" --> "option value"
 declare -A OPT
 declare -a ARG=()
 declare -a __arg_name=() __arg_multiplicity __arg_default_val __arg_help
-declare -A __opt_long_name __opt_is_flag __opt_default_val __opt_help __opt_dest
+# map of "option short name" --> "option long name"
+declare -A __opt_long_name
+# map of "option long name" --> 1 or ''
+declare -A __opt_is_flag
+# map of "option long name" --> "option default value"
+declare -A __opt_default_val
+# map of "option long name" --> "option help string"
+declare -A __opt_help
+# map of "option long name" --> "destination variable name"
+declare -A __opt_dest
+# map of "key" --> "value". Allowed keys: "help" only.
 declare -A __getoptz_conf
 
