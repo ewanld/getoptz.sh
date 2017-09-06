@@ -1,6 +1,6 @@
 #! /bin/bash
 # ------------------------------------------------------------------------------
-# getoptz.sh v0.2 - parse command line arguments
+# getoptz.sh v0.3 - parse command line arguments
 #
 # Compatible with Bash version >= 4.
 # Functions/variables starting with __ are internal functions.
