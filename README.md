@@ -2,9 +2,9 @@
 
 Command-line argument parser for Bash
 
-v0.2 beta.
+Latest version: 0.2
 
-Works for GNU Bash version >= 4.
+Compatible with GNU Bash version >= 4.
 
 ## Quickstart
 ```bash
@@ -47,7 +47,10 @@ Options:
 
 ## Features
 * Automatic generation of a help message (-h or --help option).
+* Options and arguments are mapped to Bash variables.
 * Supports short options (-o1) and long options (--option=1).
+* Options may be valued (-o1) or not (-o)
+* Supports setting multiple flags at once (e.g. '-xvf' is the same as '-x -v -f')
 * According to tradition, '--' signals the end of options.
 
 ## Examples
