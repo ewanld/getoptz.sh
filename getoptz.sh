@@ -1,9 +1,9 @@
 #! /bin/bash
 # ------------------------------------------------------------------------------
-# getoptz.sh v0.3 - parse command line arguments
+# Library to parse command line arguments.
+# Works with Bash version >= 4.
 #
-# Compatible with Bash version >= 4.
-# Functions/variables starting with __ are internal functions.
+# functions/variables starting with __ are internal functions.
 # Other functions/variables are part of the public API.
 # ------------------------------------------------------------------------------
 function getoptz_parse {
@@ -75,6 +75,7 @@ function __check_option_exists {
 	else
 		local long_name=$option_name
 	fi
+	[[ $long_name ]] || __getoptz_invalid_args "Invalid option: $option_name!"
 	[[ ${__opt_is_flag[$long_name]+x} ]] || __getoptz_invalid_args "Invalid option: $option_name!"
 }
 
