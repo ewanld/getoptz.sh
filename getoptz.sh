@@ -1,9 +1,9 @@
 #! /bin/bash
 # ------------------------------------------------------------------------------
-# Library to parse command line arguments.
-# Works with Bash version >= 4.
+# getoptz.sh v0.2 - parse command line arguments.
 #
-# functions/variables starting with __ are internal functions.
+# Compatible with Bash version >= 4.
+# Functions/variables starting with __ are internal functions.
 # Other functions/variables are part of the public API.
 # ------------------------------------------------------------------------------
 function getoptz_parse {
