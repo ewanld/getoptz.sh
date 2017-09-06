@@ -17,20 +17,33 @@ function getoptz_parse {
 			getoptz_usage
 			exit 0
 
+		elif [[ $1 =~ ^-([[:alnum:]])([[:alnum:]]+) ]]; then
+			# case -xvf
+			local short_name=${BASH_REMATCH[1]}
+			# suffix is either the value of short_name, or other flags
+			local suffix=${BASH_REMATCH[2]}
+			local long_name=$(__get_long_name "$short_name")
+			if [[ ${__opt_is_flag[$long_name]} ]]; then
+				local other_flags=$(echo "$suffix" | sed -r 's/(.)/-\1 /g')
+				set -- "$@" -"$short_name" $other_flags
+			else
+				set -- "$@" -"$short_name" "$suffix"
+			fi
+			shift
+			
 		elif [[ $1 =~ ^(-[[:alnum:]])[=:]?(.+) || \
 			    $1 =~ ^(--[[:alnum:]_-]{2,})[=:](.+) ]]; then
 			# case -v=1 or -v1 or -v:1 or --verbose=1 or --verbose:1
-			local option="${BASH_REMATCH[1]}"
+			local option_name="${BASH_REMATCH[1]}"
 			local value="${BASH_REMATCH[2]}"
-			set -- "$@" $option "$value"
+			set -- "$@" "$option_name" "$value"
 			shift
 
 		elif [[ $1 =~ ^-([[:alnum:]]) || \
 			    $1 =~ ^--([[:alnum:]_-]{2,}) ]]; then
 			# case -v 1 or -v or --verbose or --verbose 1
 			local option="${BASH_REMATCH[1]}"
-			local long_name=${__opt_long_name[$option]:-}
-			[[ $long_name ]] || __getoptz_invalid_args "unknown option: $option!"
+			local long_name=$(__get_long_name "$option")
 			local is_flag=${__opt_is_flag[$long_name]:-}
 			shift
 			[[ $is_flag || $# -ne 0 ]] || __getoptz_invalid_args "Value expected for option $option!"	
@@ -51,6 +64,18 @@ function getoptz_parse {
 	__getoptz_validate_args
 	__getoptz_eval_args
 	#unset __opt_long_name __opt_is_flag __opt_default_val __opt_help __opt_dest
+}
+
+# Return the long name associated with the option name (short name or long name)
+function __get_long_name {
+	local option_name=$1
+	if [[ ${#option_name} -eq 1 ]]; then
+		local long_name=${__opt_long_name[$option_name]:-}
+	else
+		local long_name=$option_name
+	fi
+	[[ $long_name ]] || __getoptz_invalid_args "unknown option: $option_name!"
+	echo "$long_name"
 }
 
 function __getoptz_eval_args {
@@ -181,20 +206,22 @@ function getoptz_usage {
      -h, --help
             Display this help and exit.
 "
-	local key; for key in "${!__opt_long_name[@]}"; do
-		if [[ ${#key} -eq 1 ]]; then
-			local long_name=${__opt_long_name[$key]}
-			local help_string=${__opt_help[$long_name]}
-			local is_flag=${__opt_is_flag[$long_name]}
-			local default_value=${__opt_default_val[$long_name]}
-			echo -n "     -$key"
+	local long_name; for long_name in "${!__opt_is_flag[@]}"; do
+		local short_name=${__opt_short_name[$long_name]:-}
+		local help_string=${__opt_help[$long_name]}
+		local is_flag=${__opt_is_flag[$long_name]}
+		local default_value=${__opt_default_val[$long_name]}
+		echo -n "     "
+		if [[ $short_name ]]; then
+			echo -n "-$short_name"
 			[[ $is_flag ]] || echo -ne " $u$long_name$n"
-			echo -n ", --$long_name"
-			[[ $is_flag ]] || echo -ne "=$u$long_name$n"
-			if [[ $default_value && ! $is_flag ]]; then echo -n "    [Default value: $default_value]"; fi
-			echo
-			if [[ $help_string ]]; then echo -e " $help_string\n" | sed 's/^/           /'; fi
+			echo -n ', '
 		fi
+		echo -n "--$long_name"
+		[[ $is_flag ]] || echo -ne "=$u$long_name$n"
+		if [[ $default_value && ! $is_flag ]]; then echo -n "    [Default value: $default_value]"; fi
+		echo
+		if [[ $help_string ]]; then echo -e " $help_string\n" | sed 's/^/           /'; fi
 	done
 
 	exit 1
@@ -255,8 +282,10 @@ function add_opt {
 	# check dest for special characters
 	[[ $dest =~ ^[[:alnum:]_]+$ ]] || __getoptz_die "add_opt: Invalid identifier: $dest!\n$syntax_msg"
 
-	if [[ ${short_name:-} ]]; then __opt_long_name[$short_name]=$long_name; fi
-	__opt_long_name[$long_name]=$long_name
+	if [[ ${short_name:-} ]]; then
+		__opt_long_name[$short_name]=$long_name
+		__opt_short_name[$long_name]=$short_name
+	fi
 	__opt_is_flag[$long_name]=$is_flag
 	__opt_default_val[$long_name]="$default_value"
 	__opt_help[$long_name]="$help_string"
@@ -322,6 +351,8 @@ declare -a ARG=()
 declare -a __arg_name=() __arg_multiplicity __arg_default_val __arg_help
 # map of "option short name" --> "option long name"
 declare -A __opt_long_name
+# map of "option long name" --> "option short name"
+declare -A __opt_short_name
 # map of "option long name" --> 1 or ''
 declare -A __opt_is_flag
 # map of "option long name" --> "option default value"
