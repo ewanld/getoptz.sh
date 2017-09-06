@@ -1,6 +1,6 @@
 #! /bin/bash
 # ------------------------------------------------------------------------------
-# getoptz.sh v0.2 - parse command line arguments.
+# getoptz.sh v0.2 - parse command line arguments
 #
 # Compatible with Bash version >= 4.
 # Functions/variables starting with __ are internal functions.
@@ -22,7 +22,8 @@ function getoptz_parse {
 			local short_name=${BASH_REMATCH[1]}
 			# suffix is either the value of short_name, or other flags
 			local suffix=${BASH_REMATCH[2]}
-			local long_name=$(__get_long_name "$short_name")
+			__check_option_exists "$short_name"
+			long_name=$(__get_long_name "$short_name")
 			if [[ ${__opt_is_flag[$long_name]} ]]; then
 				local other_flags=$(echo "$suffix" | sed -r 's/(.)/-\1 /g')
 				set -- "$@" -"$short_name" $other_flags
@@ -43,6 +44,7 @@ function getoptz_parse {
 			    $1 =~ ^--([[:alnum:]_-]{2,}) ]]; then
 			# case -v 1 or -v or --verbose or --verbose 1
 			local option="${BASH_REMATCH[1]}"
+			__check_option_exists "$option"
 			local long_name=$(__get_long_name "$option")
 			local is_flag=${__opt_is_flag[$long_name]:-}
 			shift
@@ -66,6 +68,16 @@ function getoptz_parse {
 	#unset __opt_long_name __opt_is_flag __opt_default_val __opt_help __opt_dest
 }
 
+function __check_option_exists {
+	local option_name=$1
+	if [[ ${#option_name} -eq 1 ]]; then
+		local long_name=${__opt_long_name[$option_name]:-}
+	else
+		local long_name=$option_name
+	fi
+	[[ ${__opt_is_flag[$long_name]+x} ]] || __getoptz_invalid_args "Invalid option: $option_name!"
+}
+
 # Return the long name associated with the option name (short name or long name)
 function __get_long_name {
 	local option_name=$1
@@ -74,7 +86,7 @@ function __get_long_name {
 	else
 		local long_name=$option_name
 	fi
-	[[ $long_name ]] || __getoptz_invalid_args "unknown option: $option_name!"
+	[[ ${__opt_is_flag[$long_name]+x} ]] || __getoptz_invalid_args "Invalid option: $option_name!"
 	echo "$long_name"
 }
 
@@ -230,14 +242,14 @@ function getoptz_usage {
 # Display message in case of programmer error
 function __getoptz_die {
 	local msg=$1
-	echo -e "$msg"
+	echo -e "$msg" >&2
 	exit 1
 }
 
 # Display message in case of user error
 function __getoptz_invalid_args {
 	local msg=$1
-	echo "$msg"
+	echo "$msg" >&2
 	getoptz_usage
 	exit 1
 }
@@ -351,7 +363,7 @@ declare -a ARG=()
 declare -a __arg_name=() __arg_multiplicity __arg_default_val __arg_help
 # map of "option short name" --> "option long name"
 declare -A __opt_long_name
-# map of "option long name" --> "option short name"
+# map of "option long name" --> "option short name". Warning: short name is optional
 declare -A __opt_short_name
 # map of "option long name" --> 1 or ''
 declare -A __opt_is_flag
