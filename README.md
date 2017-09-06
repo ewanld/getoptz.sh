@@ -2,7 +2,7 @@
 
 Command-line argument parser for Bash
 
-Latest release: v0.2
+Latest release: v0.3
 
 Compatible with GNU Bash version >= 4.
 
