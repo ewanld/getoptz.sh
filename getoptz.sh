@@ -1,9 +1,9 @@
 #! /bin/bash
 # ------------------------------------------------------------------------------
-# getoptz.sh v0.3 - parse command line arguments
+# Library to parse command line arguments.
+# Works with Bash version >= 4.
 #
-# Compatible with Bash version >= 4.
-# Functions/variables starting with __ are internal functions.
+# functions/variables starting with __ are internal functions.
 # Other functions/variables are part of the public API.
 # ------------------------------------------------------------------------------
 function getoptz_parse {
@@ -17,7 +17,7 @@ function getoptz_parse {
 			getoptz_usage
 			exit 0
 
-		elif [[ $1 =~ ^-([[:alnum:]])([[:alnum:]]+) ]]; then
+		elif [[ $1 =~ ^-([[:alnum:]])([[:alnum:]]+)$ ]]; then
 			# case -xvf
 			local short_name=${BASH_REMATCH[1]}
 			# suffix is either the value of short_name, or other flags
@@ -31,17 +31,24 @@ function getoptz_parse {
 				set -- "$@" -"$short_name" "$suffix"
 			fi
 			shift
+
+		elif [[ $1 =~ ^-([[:alnum:]])([^=:].*)$ ]]; then
+			#case -x@$^=
+			local short_name=${BASH_REMATCH[1]}
+			local value=${BASH_REMATCH[2]}
+			set -- "$@" -"$short_name" "$value"
+			shift
 			
-		elif [[ $1 =~ ^(-[[:alnum:]])[=:]?(.+) || \
-			    $1 =~ ^(--[[:alnum:]_-]{2,})[=:](.+) ]]; then
+		elif [[ $1 =~ ^(-[[:alnum:]])[=:]?(.+)$ || \
+			    $1 =~ ^(--[[:alnum:]_-]{2,})[=:](.+)$ ]]; then
 			# case -v=1 or -v1 or -v:1 or --verbose=1 or --verbose:1
 			local option_name="${BASH_REMATCH[1]}"
 			local value="${BASH_REMATCH[2]}"
 			set -- "$@" "$option_name" "$value"
 			shift
 
-		elif [[ $1 =~ ^-([[:alnum:]]) || \
-			    $1 =~ ^--([[:alnum:]_-]{2,}) ]]; then
+		elif [[ $1 =~ ^-([[:alnum:]])$ || \
+			    $1 =~ ^--([[:alnum:]_-]{2,})$ ]]; then
 			# case -v 1 or -v or --verbose or --verbose 1
 			local option="${BASH_REMATCH[1]}"
 			__check_option_exists "$option"
@@ -65,7 +72,7 @@ function getoptz_parse {
 	
 	__getoptz_validate_args
 	__getoptz_eval_args
-	#unset __opt_long_name __opt_is_flag __opt_default_val __opt_help __opt_dest
+	#unset __opt_long_name __opt_is_flag __opt_is_multi__opt_default_val __opt_help __opt_dest
 }
 
 function __check_option_exists {
@@ -75,6 +82,7 @@ function __check_option_exists {
 	else
 		local long_name=$option_name
 	fi
+	[[ $long_name ]] || __getoptz_invalid_args "Invalid option: $option_name!"
 	[[ ${__opt_is_flag[$long_name]+x} ]] || __getoptz_invalid_args "Invalid option: $option_name!"
 }
 
@@ -158,12 +166,21 @@ function __getoptz_array_add {
 			)\")"
 }
 
+function __getoptz_array_set_empty {
+	local array_name=$1
+	eval "$array_name=()"
+}
+
 function __getoptz_eval_opt {
 	local opt_long_name=$1
 	local value=$2
 	OPT[$opt_long_name]=$value
 	local opt_dest_var=${__opt_dest[$opt_long_name]}
-	if [[ $opt_dest_var ]]; then
+	[[ $opt_dest_var ]] || return 0
+
+	if [[ ${__opt_is_multi[$opt_long_name]} ]]; then
+		__getoptz_array_add "$opt_dest_var" "$value"
+	else
 		__getoptz_assign_variable "$opt_dest_var" "$value"
 	fi
 }
@@ -225,9 +242,9 @@ function getoptz_usage {
 		local default_value=${__opt_default_val[$long_name]}
 		echo -n "     "
 		if [[ $short_name ]]; then
-			echo -n "-$short_name"
+			printf -- "-$short_name"
 			[[ $is_flag ]] || echo -ne " $u$long_name$n"
-			echo -n ', '
+			printf ', '
 		fi
 		echo -n "--$long_name"
 		[[ $is_flag ]] || echo -ne "=$u$long_name$n"
@@ -281,16 +298,19 @@ function add_opt {
 	fi
 
 	# parse options
-	local default_value='' help_string='' dest=$long_name
+	local default_value='' help_string='' dest=$long_name is_multi=''
 	while [[ $# -gt 0 ]]; do
 		case "$1" in
 			--dest) dest=$2; shift 2;;
 			--help) help_string=$2; shift 2;;
+			--multi) is_multi=1; shift 1;;
 			--default) default_value=$2; shift 2;;
 			*) __getoptz_die "add_opt: unknown argument: $1!\n$syntax_msg";;
 		esac
 	done
-	
+
+	[[ ($is_multi && !$default_value) || !$is_multi ]] || __getoptz_die "add_opt: cannot set a default value for multi-valued options."
+
 	# check dest for special characters
 	[[ $dest =~ ^[[:alnum:]_]+$ ]] || __getoptz_die "add_opt: Invalid identifier: $dest!\n$syntax_msg"
 
@@ -299,11 +319,20 @@ function add_opt {
 		__opt_short_name[$long_name]=$short_name
 	fi
 	__opt_is_flag[$long_name]=$is_flag
+	__opt_is_multi[$long_name]=$is_multi
 	__opt_default_val[$long_name]="$default_value"
 	__opt_help[$long_name]="$help_string"
 	__opt_dest[$long_name]="$dest"
 
-	__getoptz_eval_opt $long_name "$default_value"
+	# assign default value to option:
+	#  - options already set by the caller, with no default value, are left unchanged.
+	if [[ !${!long_name+x} || $default_value ]]; then
+		if [[ $is_multi ]]; then
+			__getoptz_array_set_empty $long_name
+		else
+			__getoptz_eval_opt $long_name "$default_value"
+		fi
+	fi
 }
 
 # Syntax:
@@ -367,6 +396,8 @@ declare -A __opt_long_name
 declare -A __opt_short_name
 # map of "option long name" --> 1 or ''
 declare -A __opt_is_flag
+# map of "option long name" --> 1 or ''
+declare -A __opt_is_multi
 # map of "option long name" --> "option default value"
 declare -A __opt_default_val
 # map of "option long name" --> "option help string"
@@ -375,4 +406,3 @@ declare -A __opt_help
 declare -A __opt_dest
 # map of "key" --> "value". Allowed keys: "help" only.
 declare -A __getoptz_conf
-
