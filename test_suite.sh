@@ -64,6 +64,7 @@ function run_all_tests {
 	expect_exit 0 "$script_path" '-o_with_-o'
 	expect_exit 1 "$script_path" '-o:_with_-o_fail'
 	expect_exit 1 "$script_path" '-o_with_-o_2_fail'
+	expect_exit 0 "$script_path" '-opq'
 
 	# test alternative ways of setting options (--opt=2 or --opt:2 or -o2)
 	expect_exit 0 "$script_path" '--opt:_with_--opt=2'
@@ -318,14 +319,28 @@ function run_test {
 	'--opt:_with_--opt=2')
 		add_opt opt: o
 		getoptz_parse --opt=2
+		expect_equals "$opt" 2
 		;;
 	'--opt:_with_--opt:2')
 		add_opt opt: o
 		getoptz_parse --opt:2
+		expect_equals "$opt" 2
 		;;
 	'-o:_with_-o2')
 		add_opt opt: o
 		getoptz_parse -o2
+		expect_equals "$opt" 2
+		;;
+	'-opq')
+		add_opt opt1 o
+		add_opt opt2 p
+		add_opt opt3 q
+		add_opt opt4 r
+		getoptz_parse -opq
+		expect_equals "$opt1" 1
+		expect_equals "$opt2" 1
+		expect_equals "$opt3" 1
+		expect_equals "$opt4" ''
 		;;
 	*)
 		_die "unknown test: $test_name!"
