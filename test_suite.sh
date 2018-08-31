@@ -362,7 +362,8 @@ function parse_args {
 function expect_exit {
 	local expected=$1; shift
 	set +o errexit
-	echo -n "Running: $@... "
+	echo -n "Executing test: "	
+	printf '%-30s' "${@:2}"
 	if [[ $expected -eq 0 ]]; then
 		"$@" > /dev/null
 	else
