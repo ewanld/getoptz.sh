@@ -280,7 +280,7 @@ function getoptz_configure {
 }
 
 function add_opt {
-  local syntax_msg="Syntax: add_opt canon_name[:] [SHORT_NAME] [--help HELP_STRING] [--dest DEST_VAR] [--default DEFAULT_VALUE]"
+  local syntax_msg="Syntax: add_opt OPTION_NAME[:] [SHORT_NAME] [--help HELP_STRING] [--dest DEST_VAR] [--default DEFAULT_VALUE]"
 	[[ $# -ge 1 ]] || echo -e "error in add_opt!\n$syntax_msg"
 	
 	# parse positional args
