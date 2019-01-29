@@ -23,7 +23,7 @@ function getoptz_parse {
 			# suffix is either the value of short_name, or other flags
 			local suffix=${BASH_REMATCH[2]}
 			__check_option_exists "$short_name"
-			long_name=$(__get_long_name "$short_name")
+			local long_name=$(__get_long_name "$short_name")
 			if [[ ${__opt_is_flag[$long_name]} ]]; then
 				local other_flags=$(echo "$suffix" | sed -r 's/(.)/-\1 /g')
 				set -- "$@" -"$short_name" $other_flags
@@ -72,30 +72,24 @@ function getoptz_parse {
 	
 	__getoptz_validate_args
 	__getoptz_eval_args
-	#unset __opt_long_name __opt_is_flag __opt_is_multi__opt_default_val __opt_help __opt_dest
+	unset __opt_canon_name __opt_short_name __opt_is_flag __opt_is_multi __opt_default_val \
+			__opt_help __opt_help_group __opt_dest __all_help_groups __arg_name \
+			__arg_multiplicity __arg_default_val __arg_help __getoptz_conf
 }
 
 function __check_option_exists {
 	local option_name=$1
-	if [[ ${#option_name} -eq 1 ]]; then
-		local long_name=${__opt_long_name[$option_name]:-}
-	else
-		local long_name=$option_name
-	fi
-	[[ $long_name ]] || __getoptz_invalid_args "Invalid option: $option_name!"
-	[[ ${__opt_is_flag[$long_name]+x} ]] || __getoptz_invalid_args "Invalid option: $option_name!"
+	local canon_name=${__opt_canon_name[$option_name]:-}
+	[[ $canon_name ]] || __getoptz_invalid_args "Invalid option: $option_name!"
+	[[ ${__opt_is_flag[$canon_name]+x} ]] || __getoptz_invalid_args "Invalid option: $option_name!"
 }
 
-# Return the long name associated with the option name (short name or long name)
+# Return the canonical name associated with the option name (long or short)
 function __get_long_name {
 	local option_name=$1
-	if [[ ${#option_name} -eq 1 ]]; then
-		local long_name=${__opt_long_name[$option_name]:-}
-	else
-		local long_name=$option_name
-	fi
-	[[ ${__opt_is_flag[$long_name]+x} ]] || __getoptz_invalid_args "Invalid option: $option_name!"
-	echo "$long_name"
+	local canon_name=${__opt_canon_name[$option_name]:-}
+	[[ ${__opt_is_flag[$canon_name]+x} ]] || __getoptz_invalid_args "Invalid option: $option_name!"
+	echo "$canon_name"
 }
 
 function __getoptz_eval_args {
@@ -172,13 +166,13 @@ function __getoptz_array_set_empty {
 }
 
 function __getoptz_eval_opt {
-	local opt_long_name=$1
+	local canon_name=$1
 	local value=$2
-	OPT[$opt_long_name]=$value
-	local opt_dest_var=${__opt_dest[$opt_long_name]}
+	OPT[$canon_name]=$value
+	local opt_dest_var=${__opt_dest[$canon_name]}
 	[[ $opt_dest_var ]] || return 0
 
-	if [[ ${__opt_is_multi[$opt_long_name]} ]]; then
+	if [[ ${__opt_is_multi[$canon_name]} ]]; then
 		__getoptz_array_add "$opt_dest_var" "$value"
 	else
 		__getoptz_assign_variable "$opt_dest_var" "$value"
@@ -238,22 +232,22 @@ function getoptz_usage {
 	# display the default help group first.
 	local group_name; for group_name in "$__DEFAULT_HELP_GROUP" "${!__all_help_groups[@]}"; do
 		[[ $group_name == $__DEFAULT_HELP_GROUP ]] || echo "${group_name}:"
-	local long_name; for long_name in "${!__opt_is_flag[@]}"; do
+		local long_name; for long_name in "${!__opt_is_flag[@]}"; do
 			[[ $group_name == ${__opt_help_group[$long_name]} ]] || continue
-		local short_name=${__opt_short_name[$long_name]:-}
-		local help_string=${__opt_help[$long_name]}
-		local is_flag=${__opt_is_flag[$long_name]}
-		local default_value=${__opt_default_val[$long_name]}
-		echo -n "     "
-		if [[ $short_name ]]; then
-			printf -- "-$short_name"
-			[[ $is_flag ]] || echo -ne " $u$long_name$n"
-			printf ', '
-		fi
-		echo -n "--$long_name"
-		[[ $is_flag ]] || echo -ne "=$u$long_name$n"
-		if [[ $default_value && ! $is_flag ]]; then echo -n "    [Default value: $default_value]"; fi
-		echo
+			local short_name=${__opt_short_name[$long_name]:-}
+			local help_string=${__opt_help[$long_name]}
+			local is_flag=${__opt_is_flag[$long_name]}
+			local default_value=${__opt_default_val[$long_name]}
+			echo -n "     "
+			if [[ $short_name ]]; then
+				printf -- "-$short_name"
+				[[ $is_flag ]] || echo -ne " $u$long_name$n"
+				printf ', '
+			fi
+			echo -n "--$long_name"
+			[[ $is_flag ]] || echo -ne "=$u$long_name$n"
+			if [[ $default_value && ! $is_flag ]]; then echo -n "    [Default value: $default_value]"; fi
+			echo
 			if [[ $help_string ]]; then echo -e "${help_string}\n" | awk '{ print "            " $0 }'; fi
 		done
 	done
@@ -321,9 +315,10 @@ function add_opt {
 	[[ $dest =~ ^[[:alnum:]_]+$ ]] || __getoptz_die "add_opt: Invalid identifier: $dest!\n$syntax_msg"
 
 	if [[ ${short_name:-} ]]; then
-		__opt_long_name[$short_name]=$long_name
+		__opt_canon_name[$short_name]=$long_name
 		__opt_short_name[$long_name]=$short_name
 	fi
+	__opt_canon_name[$long_name]=$long_name
 	__opt_is_flag[$long_name]=$is_flag
 	__opt_is_multi[$long_name]=$is_multi
 	__opt_default_val[$long_name]="$default_value"
@@ -394,27 +389,27 @@ function getoptz_print_report {
 	done
 }
 
-# map of "option long name" --> "option value"
+# map of "option canonical name" --> "option value"
 declare -A OPT
 declare -a ARG=()
 declare -a __arg_name=() __arg_multiplicity __arg_default_val __arg_help
-# map of "option short name" --> "option long name"
-declare -A __opt_long_name
-# map of "option long name" --> "option short name". Warning: short name is optional
+# map of "option name (long or short)" --> "option canonical name"
+declare -A __opt_canon_name
+# map of "option canonical name" --> "option short name". Warning: short name is optional
 declare -A __opt_short_name
-# map of "option long name" --> 1 or ''
+# map of "option canonical name" --> 1 or ''
 declare -A __opt_is_flag
-# map of "option long name" --> 1 or ''
+# map of "option canonical name" --> 1 or ''
 declare -A __opt_is_multi
-# map of "option long name" --> "option default value"
+# map of "option canonical name" --> "option default value"
 declare -A __opt_default_val
-# map of "option long name" --> "option help string"
+# map of "option canonical name" --> "option help string"
 declare -A __opt_help
-# map of "option long namae" --> "option help group"
+# map of "option canonical namae" --> "option help group"
 declare -A __opt_help_group
 # set of all help groups (implemented as an associative array)
 declare -A __all_help_groups
-# map of "option long name" --> "destination variable name"
+# map of "option canonical name" --> "destination variable name"
 declare -A __opt_dest
 # map of "key" --> "value". Allowed keys: "help" only.
 declare -A __getoptz_conf
