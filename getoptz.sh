@@ -73,8 +73,8 @@ function getoptz_parse {
 	__getoptz_validate_args
 	__getoptz_eval_args
 	unset __opt_canon_name __opt_alias_name __opt_is_flag __opt_is_multi __opt_default_val \
-			__opt_help __opt_help_group __opt_dest __all_help_groups __arg_name \
-			__arg_multiplicity __arg_default_val __arg_help __getoptz_conf
+			# __opt_help __opt_help_group __opt_dest __all_help_groups __arg_name \
+			# __arg_multiplicity __arg_default_val __arg_help __getoptz_conf
 }
 
 function __check_option_exists {
@@ -231,16 +231,16 @@ function getoptz_usage {
 		[[ $group_name == $__DEFAULT_HELP_GROUP ]] || echo "${group_name}:"
 		local canon_name; for canon_name in "${!__opt_is_flag[@]}"; do
 			[[ $group_name == ${__opt_help_group[$canon_name]} ]] || continue
-			local alias_name=${__opt_alias_name[$canon_name]:-}
+			local alias_names=${__opt_alias_name[$canon_name]:-}
 			local help_string=${__opt_help[$canon_name]}
 			local is_flag=${__opt_is_flag[$canon_name]}
 			local default_value=${__opt_default_val[$canon_name]}
 			echo -n "     "
 			__getoptz_usage_option "$canon_name"
-			if [[ $alias_name ]]; then
+			local alias_name; for alias_name in $alias_names; do
 				echo -n ', '
 				__getoptz_usage_option "$alias_name"
-			fi
+			done
 			if [[ $default_value && ! $is_flag ]]; then echo -n "    [Default value: $default_value]"; fi
 			echo
 			if [[ $help_string ]]; then echo -e "${help_string}\n" | awk '{ print "            " $0 }'; fi
@@ -286,7 +286,7 @@ function getoptz_configure {
 }
 
 function add_opt {
-  local syntax_msg="Syntax: add_opt OPTION_NAME[:] [ALIAS] [--help HELP_STRING] [--dest DEST_VAR] [--default DEFAULT_VALUE]"
+  local syntax_msg="Syntax: add_opt OPTION_NAME[:] [ALIAS]... [--help HELP_STRING] [--dest DEST_VAR] [--default DEFAULT_VALUE]"
 	[[ $# -ge 1 ]] || echo -e "error in add_opt!\n$syntax_msg"
 	
 	# parse positional args
@@ -296,12 +296,14 @@ function add_opt {
 	shift
 	
 	local alias_name=''
-	if [[ $# -gt 0 && ${1:-} != --* ]]; then
+	while [[ $# -gt 0 && ${1:-} != --* ]]; do
 		# alias name is provided
 		alias_name=$1
 		[[ ${#alias_name} -ge 1 ]] || __getoptz_die "add_opt: SHORT_OPTION must be at least 1 character long!\n$syntax_msg"
+		__opt_canon_name[$alias_name]=$canon_name
+		__opt_alias_name[$canon_name]+=" $alias_name"
 		shift
-	fi
+	done
 
 	# parse options
 	local default_value='' help_string='' dest=$canon_name is_multi='' help_group="$__DEFAULT_HELP_GROUP"
@@ -321,10 +323,6 @@ function add_opt {
 	# check dest for special characters
 	[[ $dest =~ ^[[:alnum:]_]+$ ]] || __getoptz_die "add_opt: Invalid identifier: $dest!\n$syntax_msg"
 
-	if [[ ${alias_name:-} ]]; then
-		__opt_canon_name[$alias_name]=$canon_name
-		__opt_alias_name[$canon_name]=$alias_name
-	fi
 	__opt_canon_name[$canon_name]=$canon_name
 	__opt_is_flag[$canon_name]=$is_flag
 	__opt_is_multi[$canon_name]=$is_multi
@@ -402,7 +400,7 @@ declare -a ARG=()
 declare -a __arg_name=() __arg_multiplicity __arg_default_val __arg_help
 # map of "option name (long or short)" --> "option canonical name"
 declare -A __opt_canon_name
-# map of "option canonical name" --> "option short name". Warning: short name is optional
+# map of "option canonical name" --> "aliases, separated with spaces".
 declare -A __opt_alias_name
 # map of "option canonical name" --> 1 or ''
 declare -A __opt_is_flag

@@ -73,7 +73,8 @@ function run_all_tests {
 
 	# test option aliases
 	expect_exit 0 "$script_path" '--opt:_with_--optalias=2'
-	expect_exit 0 "$script_path" '-o:_with_--optalias=2'
+	expect_exit 0 "$script_path" '-o:_with_--optalias2=2'
+	expect_exit 0 "$script_path" '-o:_with_-z=2'
 }
 
 function run_test {
@@ -351,9 +352,14 @@ function run_test {
 		getoptz_parse --optalias=2
 		expect_equals "$opt" 2
 		;;
-	'-o:_with_--optalias=2')
-		add_opt o: optalias
-		getoptz_parse --optalias=2
+	'-o:_with_--optalias2=2')
+		add_opt o: optalias optalias2 z
+		getoptz_parse --optalias2=2
+		expect_equals "$o" 2
+		;;
+	'-o:_with_-z=2')
+		add_opt o: optalias optalias2 z
+		getoptz_parse -z=2
 		expect_equals "$o" 2
 		;;
 	*)
