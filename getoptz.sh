@@ -209,7 +209,7 @@ function getoptz_usage {
 	local help_string=${__getoptz_conf[help]:-}
 	if [[ $help_string ]]; then
 		echo "Description:"
-		echo -e "$help_string\n" | sed 's/^/    /'
+		echo -e "$help_string\n" | awk '{ print "    " $0 }'
 	fi
 
 	# arguments section
@@ -225,7 +225,7 @@ function getoptz_usage {
 			if [[ $multiplicity == @('*'|'?') ]]; then echo -n "  [optional]"; fi
 			if [[ $default_value ]]; then echo -n "  [Default value: $default_value]"; fi
 			echo
-			if [[ $help_string ]]; then echo -e "$help_string" | sed 's/^/            /'; fi
+			if [[ $help_string ]]; then echo -e "$help_string" | awk '{ print "            " $0 }'; fi
 			echo
 		done
 	fi
@@ -235,7 +235,11 @@ function getoptz_usage {
      -h, --help
             Display this help and exit.
 "
+	# display the default help group first.
+	local group_name; for group_name in "$__DEFAULT_HELP_GROUP" "${!__all_help_groups[@]}"; do
+		[[ $group_name == $__DEFAULT_HELP_GROUP ]] || echo "${group_name}:"
 	local long_name; for long_name in "${!__opt_is_flag[@]}"; do
+			[[ $group_name == ${__opt_help_group[$long_name]} ]] || continue
 		local short_name=${__opt_short_name[$long_name]:-}
 		local help_string=${__opt_help[$long_name]}
 		local is_flag=${__opt_is_flag[$long_name]}
@@ -250,7 +254,8 @@ function getoptz_usage {
 		[[ $is_flag ]] || echo -ne "=$u$long_name$n"
 		if [[ $default_value && ! $is_flag ]]; then echo -n "    [Default value: $default_value]"; fi
 		echo
-		if [[ $help_string ]]; then echo -e " $help_string\n" | sed 's/^/           /'; fi
+			if [[ $help_string ]]; then echo -e "${help_string}\n" | awk '{ print "            " $0 }'; fi
+		done
 	done
 
 	exit 1
@@ -298,13 +303,14 @@ function add_opt {
 	fi
 
 	# parse options
-	local default_value='' help_string='' dest=$long_name is_multi=''
+	local default_value='' help_string='' dest=$long_name is_multi='' help_group="$__DEFAULT_HELP_GROUP"
 	while [[ $# -gt 0 ]]; do
 		case "$1" in
 			--dest) dest=$2; shift 2;;
 			--help) help_string=$2; shift 2;;
 			--multi) is_multi=1; shift 1;;
 			--default) default_value=$2; shift 2;;
+			--group) help_group=$2; shift 2;;
 			*) __getoptz_die "add_opt: unknown argument: $1!\n$syntax_msg";;
 		esac
 	done
@@ -322,6 +328,8 @@ function add_opt {
 	__opt_is_multi[$long_name]=$is_multi
 	__opt_default_val[$long_name]="$default_value"
 	__opt_help[$long_name]="$help_string"
+	__opt_help_group[$long_name]="$help_group"
+	[[ $help_group == $__DEFAULT_HELP_GROUP ]] || __all_help_groups["$help_group"]=1
 	__opt_dest[$long_name]="$dest"
 
 	# assign default value to option:
@@ -402,7 +410,13 @@ declare -A __opt_is_multi
 declare -A __opt_default_val
 # map of "option long name" --> "option help string"
 declare -A __opt_help
+# map of "option long namae" --> "option help group"
+declare -A __opt_help_group
+# set of all help groups (implemented as an associative array)
+declare -A __all_help_groups
 # map of "option long name" --> "destination variable name"
 declare -A __opt_dest
 # map of "key" --> "value". Allowed keys: "help" only.
 declare -A __getoptz_conf
+# Default help group name
+declare -r __DEFAULT_HELP_GROUP="Options"
