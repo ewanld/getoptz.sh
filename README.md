@@ -2,7 +2,7 @@
 
 Command-line argument parser for Bash
 
-Latest release: v0.2
+Latest release: v0.3
 
 Compatible with GNU Bash version >= 4.
 
@@ -189,5 +189,3 @@ Run ```./test_suite.sh``` with no arguments to test getoptz.sh in your environme
 
 ## Restrictions
 * Options require a long name. Having only a short name is forbidden, since the long name defines the name of the variable to be written.
-* Setting multiple flags at once (e.g ```tar -xvf```) is not yet supported.
-* Not production-ready yet!

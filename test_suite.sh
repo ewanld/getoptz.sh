@@ -52,6 +52,8 @@ function run_all_tests {
 	expect_exit 0 "$script_path" 'a_with_empty_string'
 	expect_exit 0 "$script_path" 'a_with_special_chars'
 	expect_exit 0 "$script_path" 'a_with_newline'
+	expect_exit 0 "$script_path" 'a_with_dash'
+	expect_exit 0 "$script_path" 'a+_with_dash'
 
 	# test options (option name and value separated with a space)
 	expect_exit 0 "$script_path" '--opt:_with_--opt_2'
@@ -265,6 +267,19 @@ function run_test {
 		getoptz_parse 1$'\n'2
 		expect_equals "$a" 1$'\n'2
 		;;
+	'a_with_dash')
+		add_arg a
+		getoptz_parse -- --
+		expect_equals "$a" --
+		;;
+	'a+_with_dash')
+		add_arg a +
+		getoptz_parse --  1 -o --opt
+		expect_equals "${#a[@]}" 3
+		expect_equals "${a[0]}" 1
+		expect_equals "${a[1]}" -o
+		expect_equals "${a[2]}" --opt
+		;;
 	'--opt:_with_--opt_2')
 		add_opt opt:
 		getoptz_parse --opt 1
@@ -347,7 +362,8 @@ function parse_args {
 function expect_exit {
 	local expected=$1; shift
 	set +o errexit
-	echo -n "Running: $@... "
+	echo -n "Executing test: "	
+	printf '%-30s' "${@:2}"
 	if [[ $expected -eq 0 ]]; then
 		"$@" > /dev/null
 	else
