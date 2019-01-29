@@ -239,13 +239,11 @@ function getoptz_usage {
 			local is_flag=${__opt_is_flag[$canon_name]}
 			local default_value=${__opt_default_val[$canon_name]}
 			echo -n "     "
+			__getoptz_usage_option "$canon_name"
 			if [[ $short_name ]]; then
-				printf -- "-$short_name"
-				[[ $is_flag ]] || echo -ne " $u$canon_name$n"
-				printf ', '
+				echo -n ', '
+				__getoptz_usage_option "$short_name"
 			fi
-			echo -n "--$canon_name"
-			[[ $is_flag ]] || echo -ne "=$u$canon_name$n"
 			if [[ $default_value && ! $is_flag ]]; then echo -n "    [Default value: $default_value]"; fi
 			echo
 			if [[ $help_string ]]; then echo -e "${help_string}\n" | awk '{ print "            " $0 }'; fi
@@ -253,6 +251,17 @@ function getoptz_usage {
 	done
 
 	exit 1
+}
+
+# Print to standard out: "--option option" or "-o option"
+function __getoptz_usage_option {
+	local option_name=$1
+	local canon_name=${__opt_canon_name[$option_name]}
+	local is_flag=${__opt_is_flag[$canon_name]}
+	if [[ ${#option_name} -eq 1 ]]; then printf -- "-$option_name"
+	else printf -- "--$option_name"
+	fi
+	[[ $is_flag ]] || echo -ne " $u$canon_name$n"
 }
 
 # Display message in case of programmer error
@@ -292,7 +301,7 @@ function add_opt {
 	if [[ $# -gt 0 && ${1:-} != --* ]]; then
 		# short name is provided
 		local short_name=$1
-		[[ ${#short_name} -eq 1 ]] || __getoptz_die "add_opt: SHORT_OPTION must be 1 character long!\n$syntax_msg"
+		#[[ ${#short_name} -eq 1 ]] || __getoptz_die "add_opt: SHORT_OPTION must be 1 character long!\n$syntax_msg"
 		shift
 	fi
 
