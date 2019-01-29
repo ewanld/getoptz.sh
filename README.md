@@ -147,16 +147,16 @@ Syntax: ``` getoptz_usage ```
 Print a help message detailing the allowed options and arguments.
 
 ### add_opt
-Syntax: ```add_opt LONG_NAME[:] [SHORT_NAME] [--help HELP_STRING] [--group HELP_GROUP] [--dest DEST_VAR] [--default DEFAULT_VALUE]```
+Syntax: ```add_opt OPTION_NAME[:] [ALIAS]... [--help HELP_STRING] [--group HELP_GROUP] [--dest DEST_VAR] [--default DEFAULT_VALUE]```
 
 Add an option to the command line specification: valued option, or non-valued (*i.e.* flag).
 
 Argument     | Description
 ------------ | -------------
-*LONG_NAME*  |  The option long name, that the user can refer to using the ```--LONG_NAME``` syntax.<p>If LONG_NAME ends with ':', the option must have a value; otherwise it is a flag.<p><ul><li>If a valued option is set at runtime, a variable named LONG_NAME is created with the specified value.<li>If a flag is set at runtime, a variable named LONG_NAME is set to '1'.<li>If the option is not set at runtime, a variable named LONG_NAME is set to '' (empty string).</ul><p>LONG_NAME is mandatory whereas SHORT_NAME is not.
-*SHORT_NAME*  |  The option long name, that the user can refer to using the ```-SHORT_NAME``` syntax.<p>SHORT_NAME must be a single character.
+*OPTION_NAME*  |  The primary option name. It may be a short option (single character) or a long option. If ```OPTION_NAME``` ends with ':', the option must have a value; otherwise it is a flag.<p><ul><li>At runtime, a variable named ```OPTION_NAME``` will be created with the value specified in the command line.<li>If the option is a flag, the corresponding variable will be set to '1'.<li>If the option is not set in the command line, a variable named *```OPTION_NAME```* is set to ```''``` (empty string).</ul>
+*ALIAS*  |  0, 1 or more alias names that can be used to refer to this option. The alias may be a short option (single character) or a long option. At runtime, if the option is set in the command line using one of the alias names, the variable ```OPTION_NAME``` will be set with the corresponding value (note that no variable named ```ALIAS``` will be created).
 *--group HELP_GROUP*  |  This allows grouping options together in the usage text. If ommitted, the option will go in the General "Options" sections.
-*--dest DEST_VAR*  |  DEST_VAR allows to override the default mapping (LONG_NAME => variable name) for the variable name.
+*--dest DEST_VAR*  |  DEST_VAR allows to override the default mapping (```OPTION_NAME``` => variable name) for the variable name.
 *--default DEFAULT_VALUE*  |  DEFAULT_VALUE allows to override the default value ('') for missing options.
 
 ### add_arg
@@ -184,5 +184,3 @@ getoptz.sh has been tested in the following environments:
 
 Run ```./test_suite.sh``` with no arguments to test getoptz.sh in your environment.
 
-## Restrictions
-* Options require a long name. Having only a short name is forbidden, since the long name defines the name of the variable to be written.
