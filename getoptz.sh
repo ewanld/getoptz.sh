@@ -72,7 +72,7 @@ function getoptz_parse {
 	
 	__getoptz_validate_args
 	__getoptz_eval_args
-	unset __opt_canon_name __opt_short_name __opt_is_flag __opt_is_multi __opt_default_val \
+	unset __opt_canon_name __opt_alias_name __opt_is_flag __opt_is_multi __opt_default_val \
 			__opt_help __opt_help_group __opt_dest __all_help_groups __arg_name \
 			__arg_multiplicity __arg_default_val __arg_help __getoptz_conf
 }
@@ -231,7 +231,7 @@ function getoptz_usage {
 		[[ $group_name == $__DEFAULT_HELP_GROUP ]] || echo "${group_name}:"
 		local canon_name; for canon_name in "${!__opt_is_flag[@]}"; do
 			[[ $group_name == ${__opt_help_group[$canon_name]} ]] || continue
-			local short_name=${__opt_short_name[$canon_name]:-}
+			local short_name=${__opt_alias_name[$canon_name]:-}
 			local help_string=${__opt_help[$canon_name]}
 			local is_flag=${__opt_is_flag[$canon_name]}
 			local default_value=${__opt_default_val[$canon_name]}
@@ -323,7 +323,7 @@ function add_opt {
 
 	if [[ ${short_name:-} ]]; then
 		__opt_canon_name[$short_name]=$canon_name
-		__opt_short_name[$canon_name]=$short_name
+		__opt_alias_name[$canon_name]=$short_name
 	fi
 	__opt_canon_name[$canon_name]=$canon_name
 	__opt_is_flag[$canon_name]=$is_flag
@@ -403,7 +403,7 @@ declare -a __arg_name=() __arg_multiplicity __arg_default_val __arg_help
 # map of "option name (long or short)" --> "option canonical name"
 declare -A __opt_canon_name
 # map of "option canonical name" --> "option short name". Warning: short name is optional
-declare -A __opt_short_name
+declare -A __opt_alias_name
 # map of "option canonical name" --> 1 or ''
 declare -A __opt_is_flag
 # map of "option canonical name" --> 1 or ''
