@@ -73,6 +73,7 @@ function run_all_tests {
 
 	# test option aliases
 	expect_exit 0 "$script_path" '--opt:_with_--optalias=2'
+	expect_exit 0 "$script_path" '-o:_with_--optalias=2'
 }
 
 function run_test {
@@ -349,6 +350,11 @@ function run_test {
 		add_opt opt: optalias
 		getoptz_parse --optalias=2
 		expect_equals "$opt" 2
+		;;
+	'-o:_with_--optalias=2')
+		add_opt o: optalias
+		getoptz_parse --optalias=2
+		expect_equals "$o" 2
 		;;
 	*)
 		_die "unknown test: $test_name!"

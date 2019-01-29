@@ -297,11 +297,12 @@ function add_opt {
 	local is_flag=1
 	if [[ ${1: -1} == ':' ]]; then is_flag=''; fi
 	shift
-
+	
+	local short_name=''
 	if [[ $# -gt 0 && ${1:-} != --* ]]; then
 		# short name is provided
-		local short_name=$1
-		#[[ ${#short_name} -eq 1 ]] || __getoptz_die "add_opt: SHORT_OPTION must be 1 character long!\n$syntax_msg"
+		short_name=$1
+		[[ ${#short_name} -ge 1 ]] || __getoptz_die "add_opt: SHORT_OPTION must be at least 1 character long!\n$syntax_msg"
 		shift
 	fi
 
