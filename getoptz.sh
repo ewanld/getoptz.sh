@@ -23,7 +23,7 @@ function getoptz_parse {
 			# suffix is either the value of short_name, or other flags
 			local suffix=${BASH_REMATCH[2]}
 			__check_option_exists "$short_name"
-			local canon_name=$(__get_canon_name "$short_name")
+			local canon_name=${__opt_canon_name[$short_name]}
 			if [[ ${__opt_is_flag[$canon_name]} ]]; then
 				local other_flags=$(echo "$suffix" | sed -r 's/(.)/-\1 /g')
 				set -- "$@" -"$short_name" $other_flags
@@ -52,7 +52,7 @@ function getoptz_parse {
 			# case -v 1 or -v or --verbose or --verbose 1
 			local option="${BASH_REMATCH[1]}"
 			__check_option_exists "$option"
-			local canon_name=$(__get_canon_name "$option")
+			local canon_name=${__opt_canon_name[$option]}
 			local is_flag=${__opt_is_flag[$canon_name]:-}
 			shift
 			[[ $is_flag || $# -ne 0 ]] || __getoptz_invalid_args "Value expected for option $option!"	
@@ -79,16 +79,13 @@ function getoptz_parse {
 
 function __check_option_exists {
 	local option_name=$1
-	local canon_name=${__opt_canon_name[$option_name]:-}
-	[[ $canon_name ]] || __getoptz_invalid_args "Invalid option: $option_name!"
-	[[ ${__opt_is_flag[$canon_name]+x} ]] || __getoptz_invalid_args "Invalid option: $option_name!"
+	[[ ${__opt_canon_name[$option_name]+x} ]] || __getoptz_invalid_args "Invalid option: $option_name!"
 }
 
 # Return the canonical name associated with the option name (long or short)
 function __get_canon_name {
 	local option_name=$1
 	local canon_name=${__opt_canon_name[$option_name]:-}
-	[[ ${__opt_is_flag[$canon_name]+x} ]] || __getoptz_invalid_args "Invalid option: $option_name!"
 	echo "$canon_name"
 }
 
