@@ -50,12 +50,12 @@ function getoptz_parse {
 		elif [[ $1 =~ ^-([[:alnum:]])$ || \
 			    $1 =~ ^--([[:alnum:]_-]{2,})$ ]]; then
 			# case -v 1 or -v or --verbose or --verbose 1
-			local option="${BASH_REMATCH[1]}"
-			__check_option_exists "$option"
-			local canon_name=${__opt_canon_name[$option]}
+			local option_name="${BASH_REMATCH[1]}"
+			__check_option_exists "$option_name"
+			local canon_name=${__opt_canon_name[$option_name]}
 			local is_flag=${__opt_is_flag[$canon_name]:-}
 			shift
-			[[ $is_flag || $# -ne 0 ]] || __getoptz_invalid_args "Value expected for option $option!"	
+			[[ $is_flag || $# -ne 0 ]] || __getoptz_invalid_args "Value expected for option $option_name!"
 			if [[ $is_flag ]]; then
 				value=1
 			else
