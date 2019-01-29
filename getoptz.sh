@@ -231,15 +231,15 @@ function getoptz_usage {
 		[[ $group_name == $__DEFAULT_HELP_GROUP ]] || echo "${group_name}:"
 		local canon_name; for canon_name in "${!__opt_is_flag[@]}"; do
 			[[ $group_name == ${__opt_help_group[$canon_name]} ]] || continue
-			local short_name=${__opt_alias_name[$canon_name]:-}
+			local alias_name=${__opt_alias_name[$canon_name]:-}
 			local help_string=${__opt_help[$canon_name]}
 			local is_flag=${__opt_is_flag[$canon_name]}
 			local default_value=${__opt_default_val[$canon_name]}
 			echo -n "     "
 			__getoptz_usage_option "$canon_name"
-			if [[ $short_name ]]; then
+			if [[ $alias_name ]]; then
 				echo -n ', '
-				__getoptz_usage_option "$short_name"
+				__getoptz_usage_option "$alias_name"
 			fi
 			if [[ $default_value && ! $is_flag ]]; then echo -n "    [Default value: $default_value]"; fi
 			echo
@@ -286,7 +286,7 @@ function getoptz_configure {
 }
 
 function add_opt {
-  local syntax_msg="Syntax: add_opt OPTION_NAME[:] [SHORT_NAME] [--help HELP_STRING] [--dest DEST_VAR] [--default DEFAULT_VALUE]"
+  local syntax_msg="Syntax: add_opt OPTION_NAME[:] [ALIAS] [--help HELP_STRING] [--dest DEST_VAR] [--default DEFAULT_VALUE]"
 	[[ $# -ge 1 ]] || echo -e "error in add_opt!\n$syntax_msg"
 	
 	# parse positional args
@@ -295,11 +295,11 @@ function add_opt {
 	if [[ ${1: -1} == ':' ]]; then is_flag=''; fi
 	shift
 	
-	local short_name=''
+	local alias_name=''
 	if [[ $# -gt 0 && ${1:-} != --* ]]; then
-		# short name is provided
-		short_name=$1
-		[[ ${#short_name} -ge 1 ]] || __getoptz_die "add_opt: SHORT_OPTION must be at least 1 character long!\n$syntax_msg"
+		# alias name is provided
+		alias_name=$1
+		[[ ${#alias_name} -ge 1 ]] || __getoptz_die "add_opt: SHORT_OPTION must be at least 1 character long!\n$syntax_msg"
 		shift
 	fi
 
@@ -321,9 +321,9 @@ function add_opt {
 	# check dest for special characters
 	[[ $dest =~ ^[[:alnum:]_]+$ ]] || __getoptz_die "add_opt: Invalid identifier: $dest!\n$syntax_msg"
 
-	if [[ ${short_name:-} ]]; then
-		__opt_canon_name[$short_name]=$canon_name
-		__opt_alias_name[$canon_name]=$short_name
+	if [[ ${alias_name:-} ]]; then
+		__opt_canon_name[$alias_name]=$canon_name
+		__opt_alias_name[$canon_name]=$alias_name
 	fi
 	__opt_canon_name[$canon_name]=$canon_name
 	__opt_is_flag[$canon_name]=$is_flag
