@@ -147,20 +147,42 @@ Syntax: ``` getoptz_usage ```
 Print a help message detailing the allowed options and arguments.
 
 ### add_opt
-Syntax: ```add_opt LONG_NAME[:] [SHORT_NAME] [--help HELP_STRING] [--dest DEST_VAR] [--default DEFAULT_VALUE]```
+Syntax: ```add_opt LONG_NAME[:] [SHORT_NAME] [--help HELP_STRING] [--group HELP_GROUP] [--dest DEST_VAR] [--default DEFAULT_VALUE]```
 
 Add an option to the command line specification: valued option, or non-valued (*i.e.* flag).
 
+
+*LONG_NAME*
+
+The option long name, that the user can refer to using the ```--LONG_NAME``` syntax.
 If LONG_NAME ends with ':', the option must have a value; otherwise it is a flag.
 * If a valued option is set at runtime, a variable named LONG_NAME is created with the specified value.
 * If a flag is set at runtime, a variable named LONG_NAME is set to '1'.
 * If the option is not set at runtime, a variable named LONG_NAME is set to '' (empty string).
-   
-Notes:
-* SHORT_NAME must be a single character.
-* LONG_NAME is mandatory whereas SHORT_NAME is not.
-* DEST_VAR allows to override the default mapping (LONG_NAME => variable name) for the variable name.
-* DEFAULT_VALUE allows to override the default value ('') for missing options.
+
+LONG_NAME is mandatory whereas SHORT_NAME is not.
+
+
+*SHORT_NAME*
+
+The option long name, that the user can refer to using the ```-SHORT_NAME``` syntax.
+
+SHORT_NAME must be a single character.
+
+
+*--group HELP_GROUP*
+
+This allows grouping options together in the usage text. If ommitted, the option will go in the General "Options" sections.
+
+
+*--dest DEST_VAR*
+
+DEST_VAR allows to override the default mapping (LONG_NAME => variable name) for the variable name.
+
+
+*--default DEFAULT_VALUE*
+
+DEFAULT_VALUE allows to override the default value ('') for missing options.
 
 ### add_arg
 Syntax: ```add_arg ARG_NAME [1 | '?' | '+' | '*' ] [--help HELP_STRING] [--default DEFAULT_VALUE]```
