@@ -253,7 +253,7 @@ function getoptz_usage {
 # Print to standard out: "--option option" or "-o option"
 function __getoptz_usage_option {
 	local option_name=$1
-	local canon_name=${__opt_canon_name[$option_name]}
+	local canon_name=${__opt_canon_name["$option_name"]}
 	local is_flag=${__opt_is_flag[$canon_name]}
 	if [[ ${#option_name} -eq 1 ]]; then printf -- "-$option_name"
 	else printf -- "--$option_name"
@@ -354,13 +354,7 @@ function add_arg {
 	local multiplicity=1
 	if [[ $# -gt 0 && ${1:-} != --* ]]; then
 		multiplicity=$1; shift
-		[[ $multiplicity == @(1|'?'|'+'|'*') ]] || __getoptz_die "add_arg: Invalid multiplicity: $multiplicity!\n$syntax_msg"
-	fi
-
-	# validate multiplicity
-	if [[ ${#__arg_name[@]} -gt 0 ]]; then
-		local multiplicity_of_last=${__arg_multiplicity[@]: -1}
-		[[ $multiplicity_of_last == 1 || ( $multiplicity_of_last == '?' && $multiplicity == '?' ) ]] || __getoptz_die "add_arg: cannot have arg n-1 with multiplicity '$multiplicity_of_last' and arg n with multiplicity '$multiplicity' !\n$syntax_msg"
+		[[ $multiplicity == @(1|'?'|'+'|'*') ]] || __getoptz_die "add_arg: Invalid multiplicity for argument $arg_name: $multiplicity!\n$syntax_msg"
 	fi
 
 	# parse options	
@@ -373,6 +367,22 @@ function add_arg {
 		esac
 	done
 
+	# validate: default value set => multiplicity is '1' or '?'
+	if [[ $default_value ]]; then
+		if [[ $multiplicity == 1 ]]; then
+			# to simplify the validation of arguments, we change the requested multiplicity because this is what was intented by the user.
+			multiplicity='?'
+		elif [[ $multiplicity == '*' || $multiplicity == '+' ]]; then
+			__getoptz_die "add_arg: for argument $arg_name, cannot set multiplicity to '$multiplicity' with a default value. Either remove the default value, or change the multiplicity to '?'."
+		fi
+	fi
+
+
+	# validate multiplicity
+	if [[ ${#__arg_name[@]} -gt 0 ]]; then
+		local multiplicity_of_last=${__arg_multiplicity[@]: -1}
+		[[ $multiplicity_of_last == 1 || ( $multiplicity_of_last == '?' && $multiplicity == '?' ) ]] || __getoptz_die "add_arg: invalid multiplicity for argument $arg_name. Cannot have previous arg with multiplicity '$multiplicity_of_last' and $arg_name with multiplicity '$multiplicity' !\n$syntax_msg"
+	fi
 	__arg_name+=("$arg_name")
 	__arg_default_val+=("$default_value")
 	__arg_help+=("$help_string")
