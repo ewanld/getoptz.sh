@@ -13,69 +13,69 @@ function main {
 # tests ending with ' expected fail' are expected to exit with a nonzero status.
 function run_all_tests {
 	# test arguments
-	expect_exit 0 "$script_path" 'nil with nil'
-	expect_exit 1 "$script_path" 'nil with 1 expected fail'
-	expect_exit 1 "$script_path" 'nil with 1 2 expected fail'
-	expect_exit 1 "$script_path" 'a with nil expected fail'
-	expect_exit 0 "$script_path" 'a with 1'
-	expect_exit 1 "$script_path" 'a with 12 expected fail'
-	expect_exit 0 "$script_path" 'a? with nil'
-	expect_exit 0 "$script_path" 'a? with 1'
-	expect_exit 1 "$script_path" 'a? with 12 expected fail'
-	expect_exit 1 "$script_path" 'ab with 1 expected fail'
-	expect_exit 0 "$script_path" 'ab with 12'
-	expect_exit 1 "$script_path" 'ab with 123 expected fail'
-	expect_exit 0 "$script_path" 'a?b? with nil'
-	expect_exit 0 "$script_path" 'a?b? with 1'
-	expect_exit 0 "$script_path" 'a?b? with 12'
-	expect_exit 1 "$script_path" 'a?b? with 123 expected fail'
-	expect_exit 1 "$script_path" 'ab? with nil expected fail'
-	expect_exit 0 "$script_path" 'ab? with 1'
-	expect_exit 0 "$script_path" 'ab? with 12'
-	expect_exit 1 "$script_path" 'ab?_123 expected fail'
-	expect_exit 1 "$script_path" 'a?b expected fail'
-	expect_exit 0 "$script_path" 'a* with nil'
-	expect_exit 0 "$script_path" 'a* with 1'
-	expect_exit 0 "$script_path" 'a* with 12'
-	expect_exit 1 "$script_path" 'ab*_wth_nil expected fail'
-	expect_exit 1 "$script_path" 'a*b expected fail'
-	expect_exit 1 "$script_path" 'a*b* expected fail'
-	expect_exit 1 "$script_path" 'a*b+ expected fail'
-	expect_exit 1 "$script_path" 'a+ with nil expected fail'
-	expect_exit 0 "$script_path" 'a+ with 1'
-	expect_exit 0 "$script_path" 'a+ with 12'
-	expect_exit 1 "$script_path" 'a+b+ expected fail'
-	expect_exit 0 "$script_path" 'ab+ with 12'
-	expect_exit 0 "$script_path" 'ab+ with 123'
+	run_test_isolated 'nil with nil'
+	run_test_isolated 'nil with 1 expected fail'
+	run_test_isolated 'nil with 1 2 expected fail'
+	run_test_isolated 'a with nil expected fail'
+	run_test_isolated 'a with 1'
+	run_test_isolated 'a with 12 expected fail'
+	run_test_isolated 'a? with nil'
+	run_test_isolated 'a? with 1'
+	run_test_isolated 'a? with 12 expected fail'
+	run_test_isolated 'ab with 1 expected fail'
+	run_test_isolated 'ab with 12'
+	run_test_isolated 'ab with 123 expected fail'
+	run_test_isolated 'a?b? with nil'
+	run_test_isolated 'a?b? with 1'
+	run_test_isolated 'a?b? with 12'
+	run_test_isolated 'a?b? with 123 expected fail'
+	run_test_isolated 'ab? with nil expected fail'
+	run_test_isolated 'ab? with 1'
+	run_test_isolated 'ab? with 12'
+	run_test_isolated 'ab?_123 expected fail'
+	run_test_isolated 'a?b expected fail'
+	run_test_isolated 'a* with nil'
+	run_test_isolated 'a* with 1'
+	run_test_isolated 'a* with 12'
+	run_test_isolated 'ab*_wth_nil expected fail'
+	run_test_isolated 'a*b expected fail'
+	run_test_isolated 'a*b* expected fail'
+	run_test_isolated 'a*b+ expected fail'
+	run_test_isolated 'a+ with nil expected fail'
+	run_test_isolated 'a+ with 1'
+	run_test_isolated 'a+ with 12'
+	run_test_isolated 'a+b+ expected fail'
+	run_test_isolated 'ab+ with 12'
+	run_test_isolated 'ab+ with 123'
 
 	# test special chars in argument values
-	expect_exit 0 "$script_path" 'a with space'
-	expect_exit 0 "$script_path" 'a with empty_string'
-	expect_exit 0 "$script_path" 'a with special_chars'
-	expect_exit 0 "$script_path" 'a with newline'
-	expect_exit 0 "$script_path" 'a with dash'
-	expect_exit 0 "$script_path" 'a+ with dash'
+	run_test_isolated 'a with space'
+	run_test_isolated 'a with empty_string'
+	run_test_isolated 'a with special_chars'
+	run_test_isolated 'a with newline'
+	run_test_isolated 'a with dash'
+	run_test_isolated 'a+ with dash'
 
 	# test options (option name and value separated with a space)
-	expect_exit 0 "$script_path" '--opt: with --opt_2'
-	expect_exit 0 "$script_path" '--opt with --opt'
-	expect_exit 1 "$script_path" '--opt: with --opt expected fail'
-	expect_exit 1 "$script_path" '--opt with --opt_1 expected fail'
-	expect_exit 0 "$script_path" '-o: with -o_2'
-	expect_exit 0 "$script_path" '-o with -o'
-	expect_exit 1 "$script_path" '-o: with -o expected fail'
-	expect_exit 1 "$script_path" '-o with -o_2 expected fail'
-	expect_exit 0 "$script_path" '-opq'
+	run_test_isolated '--opt: with --opt_2'
+	run_test_isolated '--opt with --opt'
+	run_test_isolated '--opt: with --opt expected fail'
+	run_test_isolated '--opt with --opt_1 expected fail'
+	run_test_isolated '-o: with -o_2'
+	run_test_isolated '-o with -o'
+	run_test_isolated '-o: with -o expected fail'
+	run_test_isolated '-o with -o_2 expected fail'
+	run_test_isolated '-opq'
 
 	# test alternative ways of setting options (--opt=2 or --opt:2 or -o2)
-	expect_exit 0 "$script_path" '--opt: with --opt=2'
-	expect_exit 0 "$script_path" '--opt: with --opt:2'
-	expect_exit 0 "$script_path" '-o: with -o2'
+	run_test_isolated '--opt: with --opt=2'
+	run_test_isolated '--opt: with --opt:2'
+	run_test_isolated '-o: with -o2'
 
 	# test option aliases
-	expect_exit 0 "$script_path" '--opt: with --optalias=2'
-	expect_exit 0 "$script_path" '-o: with --optalias2=2'
-	expect_exit 0 "$script_path" '-o: with -z=2'
+	run_test_isolated '--opt: with --optalias=2'
+	run_test_isolated '-o: with --optalias2=2'
+	run_test_isolated '-o: with -z=2'
 }
 
 function run_test {
@@ -385,15 +385,18 @@ function parse_args {
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 # utility functions
 
-function expect_exit {
-	local expected=$1; shift
+function run_test_isolated {
+	local test_name=$1
+	if [[ $test_name == *"expected fail" ]]; then expected=1
+	else expected=0
+	fi
 	set +o errexit
 	echo -n "Executing test: "	
-	printf '%-30s' "${@:2}"
+	printf '%-40s' "$test_name"
 	if [[ $expected -eq 0 ]]; then
-		"$@" > /dev/null
+		"$script_path" "$test_name" > /dev/null
 	else
-		"$@" >/dev/null 2>&1
+		"$script_path" "$test_name" >/dev/null 2>&1
 	fi
 	local exit_code=$?
 	set -o errexit
