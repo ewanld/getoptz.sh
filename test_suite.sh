@@ -18,35 +18,35 @@ function run_all_tests {
 	run_test_isolated 'nil with 1 2 expected fail'
 	run_test_isolated 'a with nil expected fail'
 	run_test_isolated 'a with 1'
-	run_test_isolated 'a with 12 expected fail'
+	run_test_isolated 'a with 1 2 expected fail'
 	run_test_isolated 'a? with nil'
 	run_test_isolated 'a? with 1'
-	run_test_isolated 'a? with 12 expected fail'
+	run_test_isolated 'a? with 1 2 expected fail'
 	run_test_isolated 'ab with 1 expected fail'
-	run_test_isolated 'ab with 12'
-	run_test_isolated 'ab with 123 expected fail'
+	run_test_isolated 'ab with 1 2'
+	run_test_isolated 'ab with 1 2 3 expected fail'
 	run_test_isolated 'a?b? with nil'
 	run_test_isolated 'a?b? with 1'
-	run_test_isolated 'a?b? with 12'
-	run_test_isolated 'a?b? with 123 expected fail'
+	run_test_isolated 'a?b? with 1 2'
+	run_test_isolated 'a?b? with 1 2 3 expected fail'
 	run_test_isolated 'ab? with nil expected fail'
 	run_test_isolated 'ab? with 1'
-	run_test_isolated 'ab? with 12'
-	run_test_isolated 'ab?_123 expected fail'
+	run_test_isolated 'ab? with 1 2'
+	run_test_isolated 'ab? with 1 2 3 expected fail'
 	run_test_isolated 'a?b expected fail'
 	run_test_isolated 'a* with nil'
 	run_test_isolated 'a* with 1'
-	run_test_isolated 'a* with 12'
-	run_test_isolated 'ab*_wth_nil expected fail'
+	run_test_isolated 'a* with 1 2'
+	run_test_isolated 'ab* with nil expected fail'
 	run_test_isolated 'a*b expected fail'
 	run_test_isolated 'a*b* expected fail'
 	run_test_isolated 'a*b+ expected fail'
 	run_test_isolated 'a+ with nil expected fail'
 	run_test_isolated 'a+ with 1'
-	run_test_isolated 'a+ with 12'
+	run_test_isolated 'a+ with 1 2'
 	run_test_isolated 'a+b+ expected fail'
-	run_test_isolated 'ab+ with 12'
-	run_test_isolated 'ab+ with 123'
+	run_test_isolated 'ab+ with 1 2'
+	run_test_isolated 'ab+ with 1 2 3'
 
 	# test special chars in argument values
 	run_test_isolated 'a with space'
@@ -94,7 +94,7 @@ function run_test {
 		getoptz_parse 1
 		expect_equals "$a" 1
 		;;
-	'a with 12 expected fail')
+	'a with 1 2 expected fail')
 		add_arg a
 		getoptz_parse 1 2
 		;;
@@ -108,7 +108,7 @@ function run_test {
 		getoptz_parse 1
 		expect_equals "$a" 1
 		;;
-	'a? with 12 expected fail')
+	'a? with 1 2 expected fail')
 		add_arg a '?'
 		getoptz_parse 1 2
 		;;
@@ -117,14 +117,14 @@ function run_test {
 		add_arg b
 		getoptz_parse 1
 		;;
-	'ab with 12')
+	'ab with 1 2')
 		add_arg a
 		add_arg b
 		getoptz_parse 1 2
 		expect_equals "$a" 1
 		expect_equals "$b" 2
 		;;
-	'ab with 123 expected fail')
+	'ab with 1 2 3 expected fail')
 		add_arg a
 		add_arg b
 		getoptz_parse 1 2 3
@@ -143,14 +143,14 @@ function run_test {
 		expect_equals "$a" 1
 		expect_equals "$b" ""
 		;;
-	'a?b? with 12')
+	'a?b? with 1 2')
 		add_arg a '?'
 		add_arg b '?'
 		getoptz_parse 1 2
 		expect_equals "$a" 1
 		expect_equals "$b" 2
 		;;
-	'a?b? with 123 expected fail')
+	'a?b? with 1 2 3 expected fail')
 		add_arg a '?'
 		add_arg b '?'
 		getoptz_parse 1 2 3
@@ -167,14 +167,14 @@ function run_test {
 		expect_equals "$a" 1
 		expect_equals "$b" ""
 		;;
-	'ab? with 12')
+	'ab? with 1 2')
 		add_arg a
 		add_arg b '?'
 		getoptz_parse 1 2
 		expect_equals "$a" 1
 		expect_equals "$b" 2
 		;;
-	'ab? with 123 expected fail')
+	'ab? with 1 2 3 expected fail')
 		add_arg a
 		add_arg b '?'
 		getoptz_parse 1 2 3
@@ -192,7 +192,7 @@ function run_test {
 		getoptz_parse 1
 		expect_equals "${a[0]}" 1
 		;;
-	'a* with 12')
+	'a* with 1 2')
 		add_arg a '*'
 		getoptz_parse 1 2
 		expect_equals "${a[0]}" 1
@@ -225,7 +225,7 @@ function run_test {
 		expect_equals ${#a[@]} 1
 		expect_equals "${a[0]}" 1
 		;;
-	'a+ with 12')
+	'a+ with 1 2')
 		add_arg a '+'
 		getoptz_parse 1 2
 		expect_equals ${#a[@]} 2
@@ -236,7 +236,7 @@ function run_test {
 		add_arg a '+'
 		add_arg b '+'
 		;;
-	'ab+ with 12')
+	'ab+ with 1 2')
 		add_arg a
 		add_arg b '+'
 		getoptz_parse 1 2
@@ -244,7 +244,7 @@ function run_test {
 		expect_equals "${#b[@]}" 1
 		expect_equals "${b[0]}" 2
 		;;
-	'ab+ with 123')
+	'ab+ with 1 2 3')
 		add_arg a
 		add_arg b '+'
 		getoptz_parse 1 2 3
@@ -300,7 +300,7 @@ function run_test {
 		add_opt opt:
 		getoptz_parse --opt
 		;;
-	'--opt with --opt_2 expected fail')
+	'--opt with --opt_1 expected fail')
 		add_opt opt
 		getoptz_parse --opt 1
 		;;
@@ -391,8 +391,6 @@ function run_test_isolated {
 	else expected=0
 	fi
 	set +o errexit
-	echo -n "Executing test: "	
-	printf '%-40s' "$test_name"
 	if [[ $expected -eq 0 ]]; then
 		"$script_path" "$test_name" > /dev/null
 	else
@@ -400,6 +398,8 @@ function run_test_isolated {
 	fi
 	local exit_code=$?
 	set -o errexit
+	echo -n "Executing test: "	
+	printf '%-40s' "$test_name"
 	if [[ $exit_code -eq $expected ]]; then
 		_log "${esc_green}OK${esc_normal}"
 	else
@@ -417,7 +417,7 @@ function expect_equals {
 
 function _die {
 	echo "$@" >&2
-	exit 1
+	exit 2
 }
 
 function _log {

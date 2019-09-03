@@ -14,8 +14,7 @@ function getoptz_parse {
 			break
 
 		elif [[ $1 == @(-h|--help) ]]; then
-			getoptz_usage
-			exit 0
+			getoptz_usage 0
 
 		elif [[ $1 =~ ^-([[:alnum:]])([[:alnum:]]+)$ ]]; then
 			# case -xvf
@@ -177,7 +176,8 @@ function __getoptz_eval_opt {
 }
 
 function getoptz_usage {
-	local script_name=$(basename $0)
+	local exit_code=${1:-0}
+	local script_name=$(basename "$0")
 	local u='\033[4m'
 	local n='\033[0m'
 
@@ -247,7 +247,7 @@ function getoptz_usage {
 		done
 	done
 
-	exit 1
+	exit "$exit_code"
 }
 
 # Print to standard out: "--option option" or "-o option"
@@ -272,8 +272,7 @@ function __getoptz_die {
 function __getoptz_invalid_args {
 	local msg=$1
 	echo "$msg" >&2
-	getoptz_usage
-	exit 1
+	getoptz_usage 1
 }
 
 function getoptz_configure {
