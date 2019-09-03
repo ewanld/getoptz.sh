@@ -49,22 +49,22 @@ function run_all_tests {
 	run_test_isolated 'ab+ with 1 2 3'
 
 	# test special chars in argument values
-	run_test_isolated 'a with space'
-	run_test_isolated 'a with empty_string'
+	run_test_isolated 'a with " "'
+	run_test_isolated 'a with ""'
 	run_test_isolated 'a with special_chars'
 	run_test_isolated 'a with newline'
 	run_test_isolated 'a with dash'
 	run_test_isolated 'a+ with dash'
 
 	# test options (option name and value separated with a space)
-	run_test_isolated '--opt: with --opt_2'
+	run_test_isolated '--opt: with --opt 1'
 	run_test_isolated '--opt with --opt'
 	run_test_isolated '--opt: with --opt expected fail'
-	run_test_isolated '--opt with --opt_1 expected fail'
-	run_test_isolated '-o: with -o_2'
+	run_test_isolated '--opt with --opt 1 expected fail'
+	run_test_isolated '-o: with -o 2'
 	run_test_isolated '-o with -o'
 	run_test_isolated '-o: with -o expected fail'
-	run_test_isolated '-o with -o_2 expected fail'
+	run_test_isolated '-o with -o 2 expected fail'
 	run_test_isolated '-opq'
 
 	# test alternative ways of setting options (--opt=2 or --opt:2 or -o2)
@@ -76,6 +76,19 @@ function run_all_tests {
 	run_test_isolated '--opt: with --optalias=2'
 	run_test_isolated '-o: with --optalias2=2'
 	run_test_isolated '-o: with -z=2'
+	
+	# test default values
+	run_test_isolated '-o: --default 2 with nil'
+	run_test_isolated '-o: --default 2 with -o2'
+	run_test_isolated '-o: --default 2 with -o1'
+	run_test_isolated '-o: --default 2 with -o ""'
+	run_test_isolated '-o --default 1 with nil'
+	run_test_isolated 'a --default 2 with nil'
+	run_test_isolated 'a --default 2 with 2'
+	run_test_isolated 'a --default 2 with 1'
+	run_test_isolated 'a? --default 2 with 1'
+	run_test_isolated 'a* --default 2 expected fail'
+	run_test_isolated 'a+ --default 2 expected fail'
 }
 
 function run_test {
@@ -253,12 +266,12 @@ function run_test {
 		expect_equals "${b[0]}" 2
 		expect_equals "${b[1]}" 3
 		;;
-	'a with space')
+	'a with " "')
 		add_arg a
 		getoptz_parse ' '
 		expect_equals "$a" ' '
 		;;
-	'a with empty_string')
+	'a with ""')
 		add_arg a
 		getoptz_parse ''
 		expect_equals "$a" ''
@@ -286,7 +299,7 @@ function run_test {
 		expect_equals "${a[1]}" -o
 		expect_equals "${a[2]}" --opt
 		;;
-	'--opt: with --opt_2')
+	'--opt: with --opt 1')
 		add_opt opt:
 		getoptz_parse --opt 1
 		expect_equals "$opt" 1
@@ -300,7 +313,7 @@ function run_test {
 		add_opt opt:
 		getoptz_parse --opt
 		;;
-	'--opt with --opt_1 expected fail')
+	'--opt with --opt 1 expected fail')
 		add_opt opt
 		getoptz_parse --opt 1
 		;;
@@ -309,7 +322,7 @@ function run_test {
 		getoptz_parse -o
 		expect_equals "$opt" 1
 		;;
-	'-o: with -o_2')
+	'-o: with -o 2')
 		add_opt opt: o
 		getoptz_parse -o 2
 		expect_equals "$opt" 2
@@ -318,7 +331,7 @@ function run_test {
 		add_opt opt: o
 		getoptz_parse -o
 		;;
-	'-o with -o_2 expected fail')
+	'-o with -o 2 expected fail')
 		add_opt opt o
 		getoptz_parse -o 2
 		;;
@@ -363,10 +376,58 @@ function run_test {
 		getoptz_parse -z=2
 		expect_equals "$o" 2
 		;;
-	'-o:--default1 with nil')
+	'-o: --default 2 with nil')
 		add_opt o: --default 2
 		getoptz_parse
 		expect_equals "$o" 2
+		;;
+	'-o: --default 2 with -o2')
+		add_opt o: --default 2
+		getoptz_parse -o2
+		expect_equals "$o" 2
+		;;
+	'-o: --default 2 with -o1')
+		add_opt o: --default 2
+		getoptz_parse -o1
+		expect_equals "$o" 1
+		;;
+	'-o: --default 2 with -o ""')
+		add_opt o: --default 2
+		getoptz_parse -o ""
+		expect_equals "$o" ""
+		;;
+	'-o --default 1 with nil')
+		add_opt o --default 1
+		getoptz_parse
+		expect_equals "$o" 1
+		;;
+	'a --default 2 with nil')
+		add_arg a --default 2
+		getoptz_parse
+		expect_equals "$a" 2
+		;;
+	'a --default 2 with 2')
+		add_arg a --default 2
+		getoptz_parse 2
+		expect_equals "$a" 2
+		;;
+	'a --default 2 with 1')
+		add_arg a --default 2
+		getoptz_parse 1
+		expect_equals "$a" 1
+		;;
+	'a? --default 2 with 1')
+		add_arg a '?' --default 2
+		getoptz_parse 1
+		expect_equals "$a" 1
+		;;
+	'a* --default 2 expected fail')
+		add_arg a '*' --default 2
+		getoptz_parse 1
+		;;
+	'a+ --default 2 expected fail')
+		add_arg a '+' --default 2
+		getoptz_parse 1
 		;;
 	*)
 		_die "unknown test: $test_name!"
