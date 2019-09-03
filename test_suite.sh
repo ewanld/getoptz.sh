@@ -362,6 +362,11 @@ function run_test {
 		getoptz_parse -z=2
 		expect_equals "$o" 2
 		;;
+	'-o:--default1_with_nil')
+		add_opt o: --default 2
+		getoptz_parse
+		expect_equals "$o" 2
+		;;
 	*)
 		_die "unknown test: $test_name!"
 		;;
