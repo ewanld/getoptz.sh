@@ -10,232 +10,233 @@ function main {
 	fi
 }
 
-# tests ending with '_fail' are expected to exit with a nonzero status.
+# tests ending with ' expected fail' are expected to exit with a nonzero status.
 function run_all_tests {
 	# test arguments
-	expect_exit 0 "$script_path" 'nil_with_nil'
-	expect_exit 1 "$script_path" 'nil_with_1_fail'
-	expect_exit 1 "$script_path" 'a_with_nil_fail'
-	expect_exit 0 "$script_path" 'a_with_1'
-	expect_exit 1 "$script_path" 'a_with_12_fail'
-	expect_exit 0 "$script_path" 'a?_with_nil'
-	expect_exit 0 "$script_path" 'a?_with_1'
-	expect_exit 1 "$script_path" 'a?_with_12_fail'
-	expect_exit 1 "$script_path" 'ab_with_1_fail'
-	expect_exit 0 "$script_path" 'ab_with_12'
-	expect_exit 1 "$script_path" 'ab_with_123_fail'
-	expect_exit 0 "$script_path" 'a?b?_with_nil'
-	expect_exit 0 "$script_path" 'a?b?_with_1'
-	expect_exit 0 "$script_path" 'a?b?_with_12'
-	expect_exit 1 "$script_path" 'a?b?_with_123_fail'
-	expect_exit 1 "$script_path" 'ab?_with_nil_fail'
-	expect_exit 0 "$script_path" 'ab?_with_1'
-	expect_exit 0 "$script_path" 'ab?_with_12'
-	expect_exit 1 "$script_path" 'ab?_123_fail'
-	expect_exit 1 "$script_path" 'a?b_fail'
-	expect_exit 0 "$script_path" 'a*_with_nil'
-	expect_exit 0 "$script_path" 'a*_with_1'
-	expect_exit 0 "$script_path" 'a*_with_12'
-	expect_exit 1 "$script_path" 'ab*_wth_nil_fail'
-	expect_exit 1 "$script_path" 'a*b_fail'
-	expect_exit 1 "$script_path" 'a*b*_fail'
-	expect_exit 1 "$script_path" 'a*b+_fail'
-	expect_exit 1 "$script_path" 'a+_with_nil_fail'
-	expect_exit 0 "$script_path" 'a+_with_1'
-	expect_exit 0 "$script_path" 'a+_with_12'
-	expect_exit 1 "$script_path" 'a+b+_fail'
-	expect_exit 0 "$script_path" 'ab+_with_12'
-	expect_exit 0 "$script_path" 'ab+_with_123'
+	expect_exit 0 "$script_path" 'nil with nil'
+	expect_exit 1 "$script_path" 'nil with 1 expected fail'
+	expect_exit 1 "$script_path" 'nil with 1 2 expected fail'
+	expect_exit 1 "$script_path" 'a with nil expected fail'
+	expect_exit 0 "$script_path" 'a with 1'
+	expect_exit 1 "$script_path" 'a with 12 expected fail'
+	expect_exit 0 "$script_path" 'a? with nil'
+	expect_exit 0 "$script_path" 'a? with 1'
+	expect_exit 1 "$script_path" 'a? with 12 expected fail'
+	expect_exit 1 "$script_path" 'ab with 1 expected fail'
+	expect_exit 0 "$script_path" 'ab with 12'
+	expect_exit 1 "$script_path" 'ab with 123 expected fail'
+	expect_exit 0 "$script_path" 'a?b? with nil'
+	expect_exit 0 "$script_path" 'a?b? with 1'
+	expect_exit 0 "$script_path" 'a?b? with 12'
+	expect_exit 1 "$script_path" 'a?b? with 123 expected fail'
+	expect_exit 1 "$script_path" 'ab? with nil expected fail'
+	expect_exit 0 "$script_path" 'ab? with 1'
+	expect_exit 0 "$script_path" 'ab? with 12'
+	expect_exit 1 "$script_path" 'ab?_123 expected fail'
+	expect_exit 1 "$script_path" 'a?b expected fail'
+	expect_exit 0 "$script_path" 'a* with nil'
+	expect_exit 0 "$script_path" 'a* with 1'
+	expect_exit 0 "$script_path" 'a* with 12'
+	expect_exit 1 "$script_path" 'ab*_wth_nil expected fail'
+	expect_exit 1 "$script_path" 'a*b expected fail'
+	expect_exit 1 "$script_path" 'a*b* expected fail'
+	expect_exit 1 "$script_path" 'a*b+ expected fail'
+	expect_exit 1 "$script_path" 'a+ with nil expected fail'
+	expect_exit 0 "$script_path" 'a+ with 1'
+	expect_exit 0 "$script_path" 'a+ with 12'
+	expect_exit 1 "$script_path" 'a+b+ expected fail'
+	expect_exit 0 "$script_path" 'ab+ with 12'
+	expect_exit 0 "$script_path" 'ab+ with 123'
 
 	# test special chars in argument values
-	expect_exit 0 "$script_path" 'a_with_space'
-	expect_exit 0 "$script_path" 'a_with_empty_string'
-	expect_exit 0 "$script_path" 'a_with_special_chars'
-	expect_exit 0 "$script_path" 'a_with_newline'
-	expect_exit 0 "$script_path" 'a_with_dash'
-	expect_exit 0 "$script_path" 'a+_with_dash'
+	expect_exit 0 "$script_path" 'a with space'
+	expect_exit 0 "$script_path" 'a with empty_string'
+	expect_exit 0 "$script_path" 'a with special_chars'
+	expect_exit 0 "$script_path" 'a with newline'
+	expect_exit 0 "$script_path" 'a with dash'
+	expect_exit 0 "$script_path" 'a+ with dash'
 
 	# test options (option name and value separated with a space)
-	expect_exit 0 "$script_path" '--opt:_with_--opt_2'
-	expect_exit 0 "$script_path" '--opt_with_--opt'
-	expect_exit 1 "$script_path" '--opt:_with_--opt_fail'
-	expect_exit 1 "$script_path" '--opt_with_--opt_1_fail'
-	expect_exit 0 "$script_path" '-o:_with_-o_2'
-	expect_exit 0 "$script_path" '-o_with_-o'
-	expect_exit 1 "$script_path" '-o:_with_-o_fail'
-	expect_exit 1 "$script_path" '-o_with_-o_2_fail'
+	expect_exit 0 "$script_path" '--opt: with --opt_2'
+	expect_exit 0 "$script_path" '--opt with --opt'
+	expect_exit 1 "$script_path" '--opt: with --opt expected fail'
+	expect_exit 1 "$script_path" '--opt with --opt_1 expected fail'
+	expect_exit 0 "$script_path" '-o: with -o_2'
+	expect_exit 0 "$script_path" '-o with -o'
+	expect_exit 1 "$script_path" '-o: with -o expected fail'
+	expect_exit 1 "$script_path" '-o with -o_2 expected fail'
 	expect_exit 0 "$script_path" '-opq'
 
 	# test alternative ways of setting options (--opt=2 or --opt:2 or -o2)
-	expect_exit 0 "$script_path" '--opt:_with_--opt=2'
-	expect_exit 0 "$script_path" '--opt:_with_--opt:2'
-	expect_exit 0 "$script_path" '-o:_with_-o2'
+	expect_exit 0 "$script_path" '--opt: with --opt=2'
+	expect_exit 0 "$script_path" '--opt: with --opt:2'
+	expect_exit 0 "$script_path" '-o: with -o2'
 
 	# test option aliases
-	expect_exit 0 "$script_path" '--opt:_with_--optalias=2'
-	expect_exit 0 "$script_path" '-o:_with_--optalias2=2'
-	expect_exit 0 "$script_path" '-o:_with_-z=2'
+	expect_exit 0 "$script_path" '--opt: with --optalias=2'
+	expect_exit 0 "$script_path" '-o: with --optalias2=2'
+	expect_exit 0 "$script_path" '-o: with -z=2'
 }
 
 function run_test {
 	local -l test_name=$1; shift
 	
 	case "$test_name" in
-	'nil_with_nil') getoptz_parse;;
-	'nil_with_1_fail') getoptz_parse 1;;
-	'0_arg_2_arg_fail') getoptz_parse 1 2;;
-	'a_with_nil_fail')
+	'nil with nil') getoptz_parse;;
+	'nil with 1 expected fail') getoptz_parse 1;;
+	'nil with 1 2 expected fail') getoptz_parse 1 2;;
+	'a with nil expected fail')
 		add_arg a
 		getoptz_parse
 		;;
-	'a_with_1')
+	'a with 1')
 		add_arg a
 		getoptz_parse 1
 		expect_equals "$a" 1
 		;;
-	'a_with_12_fail')
+	'a with 12 expected fail')
 		add_arg a
 		getoptz_parse 1 2
 		;;
-	'a?_with_nil')
+	'a? with nil')
 		add_arg a '?'
 		getoptz_parse
 		expect_equals "$a" ''
 		;;
-	'a?_with_1')
+	'a? with 1')
 		add_arg a '?'
 		getoptz_parse 1
 		expect_equals "$a" 1
 		;;
-	'a?_with_12_fail')
+	'a? with 12 expected fail')
 		add_arg a '?'
 		getoptz_parse 1 2
 		;;
-	'ab_with_1_fail')
+	'ab with 1 expected fail')
 		add_arg a
 		add_arg b
 		getoptz_parse 1
 		;;
-	'ab_with_12')
+	'ab with 12')
 		add_arg a
 		add_arg b
 		getoptz_parse 1 2
 		expect_equals "$a" 1
 		expect_equals "$b" 2
 		;;
-	'ab_with_123_fail')
+	'ab with 123 expected fail')
 		add_arg a
 		add_arg b
 		getoptz_parse 1 2 3
 		;;
-	'a?b?_with_nil')
+	'a?b? with nil')
 		add_arg a '?'
 		add_arg b '?'
 		getoptz_parse
 		expect_equals "$a" ""
 		expect_equals "$b" ""
 		;;
-	'a?b?_with_1')
+	'a?b? with 1')
 		add_arg a '?'
 		add_arg b '?'
 		getoptz_parse 1
 		expect_equals "$a" 1
 		expect_equals "$b" ""
 		;;
-	'a?b?_with_12')
+	'a?b? with 12')
 		add_arg a '?'
 		add_arg b '?'
 		getoptz_parse 1 2
 		expect_equals "$a" 1
 		expect_equals "$b" 2
 		;;
-	'a?b?_with_123_fail')
+	'a?b? with 123 expected fail')
 		add_arg a '?'
 		add_arg b '?'
 		getoptz_parse 1 2 3
 		;;
-	'ab?_with_nil_fail')
+	'ab? with nil expected fail')
 		add_arg a
 		add_arg b '?'
 		getoptz_parse
 		;;
-	'ab?_with_1')
+	'ab? with 1')
 		add_arg a
 		add_arg b '?'
 		getoptz_parse 1
 		expect_equals "$a" 1
 		expect_equals "$b" ""
 		;;
-	'ab?_with_12')
+	'ab? with 12')
 		add_arg a
 		add_arg b '?'
 		getoptz_parse 1 2
 		expect_equals "$a" 1
 		expect_equals "$b" 2
 		;;
-	'ab?_with_123_fail')
+	'ab? with 123 expected fail')
 		add_arg a
 		add_arg b '?'
 		getoptz_parse 1 2 3
 		;;
-	'a?b_fail')
+	'a?b expected fail')
 		add_arg a '?'
 		add_arg b
 		;;
-	'a*_with_nil')
+	'a* with nil')
 		add_arg a '*'
 		getoptz_parse
 		;;
-	'a*_with_1')
+	'a* with 1')
 		add_arg a '*'
 		getoptz_parse 1
 		expect_equals "${a[0]}" 1
 		;;
-	'a*_with_12')
+	'a* with 12')
 		add_arg a '*'
 		getoptz_parse 1 2
 		expect_equals "${a[0]}" 1
 		expect_equals "${a[1]}" 2
 		;;
-	'ab*_with_nil_fail')
+	'ab* with nil expected fail')
 		add_arg a
 		add_arg b '*'
 		getoptz_parse
 		;;
-	'a*b_fail')
+	'a*b expected fail')
 		add_arg a '*'
 		add_arg b
 		;;
-	'a*b*_fail')
+	'a*b* expected fail')
 		add_arg a '*'
 		add_arg b '*'
 		;;
-	'a*b+_fail')
+	'a*b+ expected fail')
 		add_arg a '*'
 		add_arg b '+'
 		;;
-	'a+_with_nil_fail')
+	'a+ with nil expected fail')
 		add_arg a '+'
 		getoptz_parse
 		;;
-	'a+_with_1')
+	'a+ with 1')
 		add_arg a '+'
 		getoptz_parse 1
 		expect_equals ${#a[@]} 1
 		expect_equals "${a[0]}" 1
 		;;
-	'a+_with_12')
+	'a+ with 12')
 		add_arg a '+'
 		getoptz_parse 1 2
 		expect_equals ${#a[@]} 2
 		expect_equals "${a[0]}" 1
 		expect_equals "${a[1]}" 2
 		;;
-	'a+b+_fail')
+	'a+b+ expected fail')
 		add_arg a '+'
 		add_arg b '+'
 		;;
-	'ab+_with_12')
+	'ab+ with 12')
 		add_arg a
 		add_arg b '+'
 		getoptz_parse 1 2
@@ -243,7 +244,7 @@ function run_test {
 		expect_equals "${#b[@]}" 1
 		expect_equals "${b[0]}" 2
 		;;
-	'ab+_with_123')
+	'ab+ with 123')
 		add_arg a
 		add_arg b '+'
 		getoptz_parse 1 2 3
@@ -252,32 +253,32 @@ function run_test {
 		expect_equals "${b[0]}" 2
 		expect_equals "${b[1]}" 3
 		;;
-	'a_with_space')
+	'a with space')
 		add_arg a
 		getoptz_parse ' '
 		expect_equals "$a" ' '
 		;;
-	'a_with_empty_string')
+	'a with empty_string')
 		add_arg a
 		getoptz_parse ''
 		expect_equals "$a" ''
 		;;
-	'a_with_special_chars')
+	'a with special_chars')
 		add_arg a
 		getoptz_parse '$*'
 		expect_equals "$a" '$*'
 		;;
-	'a_with_newline')
+	'a with newline')
 		add_arg a
 		getoptz_parse 1$'\n'2
 		expect_equals "$a" 1$'\n'2
 		;;
-	'a_with_dash')
+	'a with dash')
 		add_arg a
 		getoptz_parse -- --
 		expect_equals "$a" --
 		;;
-	'a+_with_dash')
+	'a+ with dash')
 		add_arg a +
 		getoptz_parse --  1 -o --opt
 		expect_equals "${#a[@]}" 3
@@ -285,53 +286,53 @@ function run_test {
 		expect_equals "${a[1]}" -o
 		expect_equals "${a[2]}" --opt
 		;;
-	'--opt:_with_--opt_2')
+	'--opt: with --opt_2')
 		add_opt opt:
 		getoptz_parse --opt 1
 		expect_equals "$opt" 1
 		;;
-	'--opt_with_--opt')
+	'--opt with --opt')
 		add_opt opt
 		getoptz_parse --opt
 		expect_equals "$opt" 1
 		;;
-	'--opt:_with_--opt_fail')
+	'--opt: with --opt expected fail')
 		add_opt opt:
 		getoptz_parse --opt
 		;;
-	'--opt_with_--opt_2_fail')
+	'--opt with --opt_2 expected fail')
 		add_opt opt
 		getoptz_parse --opt 1
 		;;
-	'-o_with_-o')
+	'-o with -o')
 		add_opt opt o
 		getoptz_parse -o
 		expect_equals "$opt" 1
 		;;
-	'-o:_with_-o_2')
+	'-o: with -o_2')
 		add_opt opt: o
 		getoptz_parse -o 2
 		expect_equals "$opt" 2
 		;;
-	'-o:_with_-o_fail')
+	'-o: with -o expected fail')
 		add_opt opt: o
 		getoptz_parse -o
 		;;
-	'-o_with_-o_2_fail')
+	'-o with -o_2 expected fail')
 		add_opt opt o
 		getoptz_parse -o 2
 		;;
-	'--opt:_with_--opt=2')
+	'--opt: with --opt=2')
 		add_opt opt: o
 		getoptz_parse --opt=2
 		expect_equals "$opt" 2
 		;;
-	'--opt:_with_--opt:2')
+	'--opt: with --opt:2')
 		add_opt opt: o
 		getoptz_parse --opt:2
 		expect_equals "$opt" 2
 		;;
-	'-o:_with_-o2')
+	'-o: with -o2')
 		add_opt opt: o
 		getoptz_parse -o2
 		expect_equals "$opt" 2
@@ -347,22 +348,22 @@ function run_test {
 		expect_equals "$opt3" 1
 		expect_equals "$opt4" ''
 		;;
-	'--opt:_with_--optalias=2')
+	'--opt: with --optalias=2')
 		add_opt opt: optalias
 		getoptz_parse --optalias=2
 		expect_equals "$opt" 2
 		;;
-	'-o:_with_--optalias2=2')
+	'-o: with --optalias2=2')
 		add_opt o: optalias optalias2 z
 		getoptz_parse --optalias2=2
 		expect_equals "$o" 2
 		;;
-	'-o:_with_-z=2')
+	'-o: with -z=2')
 		add_opt o: optalias optalias2 z
 		getoptz_parse -z=2
 		expect_equals "$o" 2
 		;;
-	'-o:--default1_with_nil')
+	'-o:--default1 with nil')
 		add_opt o: --default 2
 		getoptz_parse
 		expect_equals "$o" 2
