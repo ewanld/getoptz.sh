@@ -180,6 +180,10 @@ function getoptz_usage {
 	local script_name=$(basename "$0")
 	local u='\033[4m'
 	local n='\033[0m'
+	# restore IFS to its default value (space+newline+tab), in case it was changed by the caller script.
+	# It is necessary for 'for' loops below.
+	local old_ifs=${IFS:- $'\n'$'\t'}
+	IFS=' '$'\n'$'\t'
 
 	# Usage section
 	echo -ne "${n}Usage: $script_name [${u}options${n}] [--]"
@@ -247,6 +251,7 @@ function getoptz_usage {
 		done
 	done
 
+	IFS=$old_ifs
 	exit "$exit_code"
 }
 
